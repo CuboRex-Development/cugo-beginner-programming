@@ -99,5 +99,6 @@
   void rc_mode(volatile unsigned long rcTime[PWM_IN_MAX],MotorController motor_controllers[2]);
   void stop_motor_immediately(MotorController motor_controllers[2]);
   void wait_time(int milisec,bool cmd_init,int *init_current_cmd,int arduino_cmd_matrix[CMD_SIZE][6] );
+  void reset_pid_gain(MotorController motor_controllers[2]);
 
 #endif

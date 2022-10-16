@@ -335,3 +335,61 @@ void stop_motor_immediately(MotorController motor_controllers[2])
   motor_controllers[1].setTargetRpm(0.0);
   motor_direct_instructions(1500, 1500,motor_controllers);
 }
+
+void reset_pid_gain(MotorController motor_controllers[2])
+{
+  for (int i = 0; i < MOTOR_NUM; i++)
+  {
+    motor_controllers[i].reset_PID_param();
+  }
+}
+
+
+
+
+
+
+//未使用関数：プロトタイプ宣言も未実施
+/*
+String get_send_cmd_string()
+{
+  String send_msg = String(motor_controllers[MOTOR_LEFT].getCount()) +
+                    "," +
+                    String(motor_controllers[MOTOR_RIGHT].getCount());
+  //Serial.println(send_msg);
+  return send_msg;
+}
+*/
+/*
+  void UDP_read_write(int packetSize)
+  {
+  // 送信用のデータを整理
+  char send_buff[UDP_BUFF_SIZE];
+  String send_str = get_send_cmd_string();  // Stringクラスを使いたかったもので
+  send_str.toCharArray(send_buff, UDP_BUFF_SIZE);
+  display_UDP(packetSize, send_buff);
+  //Serial.println(send_buff); // 確認用
+
+  // バッファにたまったデータを抜き出して制御に適用
+  Udp.read(packetBuffer, UDP_BUFF_SIZE);
+
+  set_motor_cmd(packetBuffer);
+
+  // 送信された相手に対して制御結果を投げ返す。したがって相手のIPアドレスの指定などは不要
+  Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+  Udp.write(send_buff);
+  Udp.endPacket();
+  }
+*/
+/*
+  void UDP_FAIL_CHECK()
+  {
+
+  }
+*/
+/*
+  void recieve_serial_cmd()
+  {
+  reciev_str = Serial.readStringUntil('\n');
+  }
+*/

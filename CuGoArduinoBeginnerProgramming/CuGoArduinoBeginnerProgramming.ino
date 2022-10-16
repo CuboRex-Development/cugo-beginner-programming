@@ -116,7 +116,7 @@ ISR(PCINT2_vect)
   }
 }
 
-//CugoArduinoModeへの移動不可?
+//移動すべきではない　attachInterruptが入っているため
 void init_PID()
 {
   pinMode(PIN_ENCODER_L_A, INPUT_PULLUP);     //A相用信号入力　入力割り込みpinを使用　内蔵プルアップ有効
@@ -150,7 +150,7 @@ void rightEncHandler()
   motor_controllers[MOTOR_RIGHT].updateEnc();
 }
 
-//
+//CMD_EXECUTEが張っているため退避不可
 void arduino_mode()
 {
   digitalWrite(LED_BUILTIN, HIGH);  // ARDUINO_MODEでLED点灯
@@ -160,7 +160,7 @@ void arduino_mode()
   }
 }
 
-//
+//割り込み周りが入っているため退避すべきではない
 void check_mode_change()
 {
   noInterrupts();      //割り込み停止
@@ -178,7 +178,7 @@ void check_mode_change()
       //motor_direct_instructions(1500, 1500,,motor_controllers); //直接停止命令を出す
     }
     reset_arduino_mode_flags();
-    reset_pid_gain();
+    reset_pid_gain(motor_controllers);
     runMode = ARDUINO_MODE;
   }
   else if (ARDUINO_MODE_OUT > rcTime[1])
@@ -252,58 +252,6 @@ void set_motor_cmd(String reciev_str)
     }
   }
 }
-//
-String get_send_cmd_string()
-{
-  String send_msg = String(motor_controllers[MOTOR_LEFT].getCount()) +
-                    "," +
-                    String(motor_controllers[MOTOR_RIGHT].getCount());
-  //Serial.println(send_msg);
-  return send_msg;
-}
-//
-void reset_pid_gain()
-{
-  for (int i = 0; i < MOTOR_NUM; i++)
-  {
-    motor_controllers[i].reset_PID_param();
-  }
-}
-/* 工事中
-  void recieve_serial_cmd()
-  {
-  reciev_str = Serial.readStringUntil('\n');
-  }
-*/
-
-
-/*
-  void UDP_read_write(int packetSize)
-  {
-  // 送信用のデータを整理
-  char send_buff[UDP_BUFF_SIZE];
-  String send_str = get_send_cmd_string();  // Stringクラスを使いたかったもので
-  send_str.toCharArray(send_buff, UDP_BUFF_SIZE);
-  display_UDP(packetSize, send_buff);
-  //Serial.println(send_buff); // 確認用
-
-  // バッファにたまったデータを抜き出して制御に適用
-  Udp.read(packetBuffer, UDP_BUFF_SIZE);
-
-  set_motor_cmd(packetBuffer);
-
-  // 送信された相手に対して制御結果を投げ返す。したがって相手のIPアドレスの指定などは不要
-  Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-  Udp.write(send_buff);
-  Udp.endPacket();
-  }
-
-
-  void UDP_FAIL_CHECK()
-  {
-
-  }
-*/
 //
 void view_flags()
 {
