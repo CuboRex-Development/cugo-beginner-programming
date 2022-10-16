@@ -156,7 +156,7 @@ void calc_necessary_rotate(float degree,long int *target_count_L,long int *targe
   //while(1);
 }
 
-//たたまない？
+
 void calc_necessary_count(float distance,long int *target_count_L,long int *target_count_R) // TODO:ベクトルを入れるが、回転や並進で別の関数にならないか確認が必要
 {
   //  *target_count_L = distance * encoder_resolution / (2 * wheel_radius_l * PI);
@@ -392,4 +392,31 @@ String get_send_cmd_string()
   {
   reciev_str = Serial.readStringUntil('\n');
   }
+*/
+
+/*
+void set_motor_cmd(String reciev_str)
+{
+  if (reciev_str.length() > 0)
+  {
+    // 2輪の場合
+    String sp_reciev_str[2];
+    split(reciev_str, ',', sp_reciev_str);
+
+    for (int i = 0; i < MOTOR_NUM; i++) {
+      motor_controllers[i].setTargetRpm(sp_reciev_str[i].toFloat());
+    }
+    //  モータに指令値を無事セットできたら、通信失敗カウンタをリセット
+    //    毎回リセットすることで通常通信できる。
+    //    10Hzで通信しているので、100msJOBでカウンタアップ。
+    //    UDP_FAIL_COUNT = 0;
+  }
+  else
+  {
+    for (int i = 0; i < MOTOR_NUM; i++) {
+      motor_controllers[i].setTargetRpm(0.0);
+    }
+  }
+}
+
 */

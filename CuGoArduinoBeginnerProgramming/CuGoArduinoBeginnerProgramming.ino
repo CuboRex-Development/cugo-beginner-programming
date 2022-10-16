@@ -227,31 +227,7 @@ void job_1000ms()
   //display_nothing(UDP_CONNECTION_DISPLAY,ENCODER_DISPLAY,PID_CONTROLL_DISPLAY);
 }
 
-//
-void set_motor_cmd(String reciev_str)
-{
-  if (reciev_str.length() > 0)
-  {
-    // 2輪の場合
-    String sp_reciev_str[2];
-    split(reciev_str, ',', sp_reciev_str);
 
-    for (int i = 0; i < MOTOR_NUM; i++) {
-      motor_controllers[i].setTargetRpm(sp_reciev_str[i].toFloat());
-    }
-    /*  モータに指令値を無事セットできたら、通信失敗カウンタをリセット
-        毎回リセットすることで通常通信できる。
-        10Hzで通信しているので、100msJOBでカウンタアップ。
-    */
-    //    UDP_FAIL_COUNT = 0;
-  }
-  else
-  {
-    for (int i = 0; i < MOTOR_NUM; i++) {
-      motor_controllers[i].setTargetRpm(0.0);
-    }
-  }
-}
 //
 void view_flags()
 {
@@ -396,7 +372,7 @@ void check_achievement_go_forward_cmd()
   bool L_done = false;
   bool R_done = false;
 
-  // L側目標達成チェック
+  // L側目標達成チェック// 位置制御とバッティングする　
   if (cmd_L_back == false) {
     if (target_count_L < motor_controllers[MOTOR_LEFT].getCount())
       L_done = true;
@@ -504,6 +480,69 @@ void cmd_manager()
     {
       //Serial.println("#     cmd_exec_main    #");
       // コマンドで設定された速度に設定
+      
+      //ここで速度制御：setTargetRpm目標速度の設定
+      /*実装予定のコード
+      //使うもの
+      arduino_cmd_matrix[current_cmd][1] //L側の目標カウント数
+      arduino_cmd_matrix[current_cmd][2] //R側の目標カウント数
+      motor_controllers[MOTOR_LEFT].getCount() //Lの現在のカウント数 
+      motor_controllers[MOTOR_LEFT].getCount() //Rの現在のカウント数 
+
+      //コード
+      //グローバルに記載
+      // PID ゲイン調整
+      const float L_COUNT_KP = 1.0;
+      const float L_COUNT_KI = 0.06;
+      const float L_COUNT_KD = 0.1;
+      const float R_COUNT_KP = 1.0;
+      const float R_COUNT_KI = 0.06;
+      const float R_COUNT_KD = 0.1;
+      float l_count_prev_i_ = 0;
+      float l_count_prev_p_ = 0;
+      float r_count_prev_i_ = 0;
+      float r_count_prev_p_ = 0;
+      flaot l_count_gain = 0;
+      flaot r_count_gain = 0;
+      
+      //本関数内に記載        
+      float l_count_p;  // P制御値
+      float l_count_i;  // I制御値
+      float l_count_d;  // D制御値
+      float r_count_p;  // P制御値
+      float r_count_i;  // I制御値
+      float r_count_d;  // D制御値
+
+      // 各制御値の計算
+      l_count_p = arduino_cmd_matrix[current_cmd][1] - motor_controllers[MOTOR_LEFT].getCount();
+      l_count_i = l_count_prev_i_ + l_count_p;
+      l_count_d = l_count_p - l_prev_p_;
+      r_count_p = arduino_cmd_matrix[current_cmd][1] - motor_controllers[MOTOR_LEFT].getCount();
+      r_count_i = r_count_prev_i_ + r_count_p;
+      r_count_d = r_count_p - r_prev_p_;
+
+      // PID制御
+      l_count_gain = l_count_p * L_COUNT_KP + l_count_i * L_COUNT_KI + l_count_d * L_COUNT_KD;  
+      r_count_gain = r_count_p * R_COUNT_KP + r_count_i * R_COUNT_KI + r_count_d * R_COUNT_KD;  
+      // prev_ 更新
+      l_count_prev_p_ = l_count_p;
+      l_count_prev_i_ = l_count_i;
+      r_count_prev_p_ = r_count_p;
+      r_count_prev_i_ = r_count_i;
+
+     //以降は必要であれば追加//
+      // iゲインの発散補償（自動整合）
+      //float surplus = limitSpeed();
+      //prev_i_ = prev_i_ - surplus * kp_;
+      // 停止中のiゲインの定常偏差をリセット（モータの不感地帯での制御がかかってしまうため）
+        if(target_rpm_ == 0.0 || p == 0.0){
+        stop_cnt++;
+        }
+       if(stop_cnt > 100){
+       prev_i_ = 0.0;
+       stop_cnt = 0;
+       }
+      */
       motor_controllers[MOTOR_LEFT].setTargetRpm(arduino_cmd_matrix[current_cmd][4]);
       motor_controllers[MOTOR_RIGHT].setTargetRpm(arduino_cmd_matrix[current_cmd][5]);
 
