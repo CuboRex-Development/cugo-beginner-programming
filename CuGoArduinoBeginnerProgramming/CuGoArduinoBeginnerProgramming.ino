@@ -227,7 +227,6 @@ void job_1000ms()
   //display_nothing(UDP_CONNECTION_DISPLAY,ENCODER_DISPLAY,PID_CONTROLL_DISPLAY);
 }
 
-
 //
 void view_flags()
 {
