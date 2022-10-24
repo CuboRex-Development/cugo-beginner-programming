@@ -3,14 +3,19 @@
 #include "MotorController.h"
 #include <SPI.h>
 
+int arduino_cmd_matrix[CMD_SIZE][6];
+int init_current_cmd = 0;
+
 
 void init_SPI()
 {
+  Serial.println("init_SPI()");// デバッグ用確認
   SPI.begin();
   digitalWrite(SS, HIGH);
 }
 
 void send_spi(int mode) {
+  Serial.println("send_spi()");// デバッグ用確認
   digitalWrite(SS, LOW);
   SPI.transfer(mode);
   digitalWrite(SS, HIGH);
@@ -18,6 +23,7 @@ void send_spi(int mode) {
 
 void init_KOPROPO(int runMode,int OLD_PWM_IN_PIN0_VALUE,int OLD_PWM_IN_PIN1_VALUE,int OLD_PWM_IN_PIN2_VALUE)
 {
+  Serial.println("init_KOPROPO()");// デバッグ用確認
   // ピン変化割り込みの初期状態保存
   runMode = RC_MODE;
   OLD_PWM_IN_PIN0_VALUE = digitalRead(PWM_IN_PIN0);
@@ -35,27 +41,31 @@ void init_KOPROPO(int runMode,int OLD_PWM_IN_PIN0_VALUE,int OLD_PWM_IN_PIN1_VALU
   delay(100);
 }
 
-void set_arduino_cmd_matrix(int cmd_no, int cmd_0, int cmd_1, int cmd_2, int cmd_3, int cmd_4, int cmd_5,int arduino_cmd_matrix[CMD_SIZE][6])
+void set_arduino_cmd_matrix(long int cmd_0,long int cmd_1,int cmd_2,int cmd_3,long int cmd_4,long int cmd_5)
 {
-  arduino_cmd_matrix[cmd_no][0] = cmd_0;
-  arduino_cmd_matrix[cmd_no][1] = cmd_1;
-  arduino_cmd_matrix[cmd_no][2] = cmd_2;
-  arduino_cmd_matrix[cmd_no][3] = cmd_3;
-  arduino_cmd_matrix[cmd_no][4] = cmd_4;
-  arduino_cmd_matrix[cmd_no][5] = cmd_5;
+  //Serial.println("set_arduino_cmd_matrix()");// デバッグ用確認
+  arduino_cmd_matrix[init_current_cmd][0] = cmd_0;
+  arduino_cmd_matrix[init_current_cmd][1] = cmd_1;
+  arduino_cmd_matrix[init_current_cmd][2] = cmd_2;
+  arduino_cmd_matrix[init_current_cmd][3] = cmd_3;
+  arduino_cmd_matrix[init_current_cmd][4] = cmd_4;
+  arduino_cmd_matrix[init_current_cmd][5] = cmd_5;
 }
 
-void init_ARDUINO_CMD(int arduino_cmd_matrix[CMD_SIZE][6])
+void init_ARDUINO_CMD()
 {
   pinMode(CMD_BUTTON_PIN, INPUT);
   for (int i = 0; i < CMD_SIZE; i++)
   {
-    set_arduino_cmd_matrix(i, EXCEPTION_NO, EXCEPTION_NO, EXCEPTION_NO, EXCEPTION_NO, EXCEPTION_NO, EXCEPTION_NO,arduino_cmd_matrix);
+    init_current_cmd = i;
+    set_arduino_cmd_matrix(EXCEPTION_NO, EXCEPTION_NO, EXCEPTION_NO, EXCEPTION_NO, EXCEPTION_NO, EXCEPTION_NO);
   }
+  init_current_cmd = 0;//初期化
 }
 
-void view_arduino_cmd_matrix(int arduino_cmd_matrix[CMD_SIZE][6])
+void view_arduino_cmd_matrix()
 {
+  Serial.println("view_arduino_cmd_matrix");// デバッグ用確認
   for (int i = 0; i < CMD_SIZE; i++)
   {
     Serial.println(arduino_cmd_matrix[i][0]);
@@ -71,6 +81,7 @@ void view_arduino_cmd_matrix(int arduino_cmd_matrix[CMD_SIZE][6])
 
 void display_failsafe(bool FAIL_SAFE_DISPLAY,int runMode)
 {
+  //Serial.println("display_failsafe");// デバッグ用確認
   if (FAIL_SAFE_DISPLAY == true)
   {
     Serial.println("DISPLAY FAIL SAFE PARAM");
@@ -87,6 +98,7 @@ void display_failsafe(bool FAIL_SAFE_DISPLAY,int runMode)
 
 void display_nothing(bool UDP_CONNECTION_DISPLAY,bool ENCODER_DISPLAY,bool PID_CONTROLL_DISPLAY)
 {
+  //Serial.println("display_nothing");// デバッグ用確認
   if (UDP_CONNECTION_DISPLAY == false && ENCODER_DISPLAY == false && PID_CONTROLL_DISPLAY == false)
   {
     Serial.println("Display item not set");
@@ -95,13 +107,15 @@ void display_nothing(bool UDP_CONNECTION_DISPLAY,bool ENCODER_DISPLAY,bool PID_C
   }
 }
 
-void spi_cmd(int spi_cmd_value,int *init_current_cmd ,int arduino_cmd_matrix[CMD_SIZE][6],bool cmd_init)
+void spi_cmd(int spi_cmd_value,bool cmd_init)
 {
+  Serial.println("spi_cmd");// デバッグ用確認
   if (cmd_init == false)
   {
 
-    if (*init_current_cmd >= CMD_SIZE - 1)
+    if (init_current_cmd >= CMD_SIZE - 1)
     {
+      Serial.println("init_current_cmd: " + String(init_current_cmd));
       Serial.println("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。");
       while (1);
 
@@ -109,8 +123,8 @@ void spi_cmd(int spi_cmd_value,int *init_current_cmd ,int arduino_cmd_matrix[CMD
     // 初回起動時の処理
     // テスト(ボタンのフラグbutton_enable==1としてテスト）
     // メモリが足りないので、buttonとSPIを共用にする。
-    set_arduino_cmd_matrix(init_current_cmd, EXCEPTION_NO, EXCEPTION_NO, EXCEPTION_NO, spi_cmd_value, 0, 0,arduino_cmd_matrix); // ここではテストで1を使用。
-    *init_current_cmd++;
+    set_arduino_cmd_matrix( EXCEPTION_NO, EXCEPTION_NO, EXCEPTION_NO, spi_cmd_value, 0, 0); // ここではテストで1を使用。
+    init_current_cmd++;
 
   }
   else
@@ -120,20 +134,23 @@ void spi_cmd(int spi_cmd_value,int *init_current_cmd ,int arduino_cmd_matrix[CMD
   }
 }
 
-void wait_time(int milisec,bool cmd_init,int *init_current_cmd,int arduino_cmd_matrix[CMD_SIZE][6] )
+void wait_time(int milisec,bool cmd_init)
 {
+  //Serial.println("wait_time");// デバッグ用確認
   if (cmd_init == false)
   {
 
     if (init_current_cmd >= CMD_SIZE - 1)
     {
+      Serial.println("init_current_cmd: " + String(init_current_cmd));
       Serial.println("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。");
       while (1);
     }
 
     // 初回起動時の処理
     // テスト(3000msの待機を固定して全体の動作テスト）
-    set_arduino_cmd_matrix(init_current_cmd, EXCEPTION_NO, EXCEPTION_NO, milisec, EXCEPTION_NO, 0, 0,arduino_cmd_matrix); // ここではテストで3000ms間、rpmを0,0(停止)にセット
+    //Serial.println("init_current_cmd: " + String(init_current_cmd));
+    set_arduino_cmd_matrix(EXCEPTION_NO,EXCEPTION_NO, milisec, EXCEPTION_NO, 0, 0); // ここではテストで3000ms間、rpmを0,0(停止)にセット//EXCEPTION_NO
     init_current_cmd++;
 
   }
@@ -146,10 +163,11 @@ void wait_time(int milisec,bool cmd_init,int *init_current_cmd,int arduino_cmd_m
 
 void calc_necessary_rotate(float degree,long int *target_count_L,long int *target_count_R) // TODO:ベクトルを入れるが、回転や並進で別の関数にならないか確認が必要
 {
+  //Serial.println("calc_necessary_rotate");// デバッグ用確認
   *target_count_L =  ((degree / 360) * tread * PI) * encoder_resolution / (2 * wheel_radius_l * PI);
   *target_count_R = -((degree / 360) * tread * PI) * encoder_resolution / (2 * wheel_radius_r * PI);
-  Serial.println("degree: " + String(degree));
-  Serial.println("### target_count_L/R: " + String(*target_count_L) + " / " + String(*target_count_R) + "###");
+  //Serial.println("degree: " + String(degree));
+  //Serial.println("### target_count_L/R: " + String(*target_count_L) + " / " + String(*target_count_R) + "###");
   //Serial.println("kakudo: " + String((degree / 360) * tread * PI));
   //Serial.println("PI: " + String(PI));
   //Serial.println("issyuu: " + String(2 * wheel_radius_r * PI));
@@ -159,6 +177,7 @@ void calc_necessary_rotate(float degree,long int *target_count_L,long int *targe
 
 void calc_necessary_count(float distance,long int *target_count_L,long int *target_count_R) // TODO:ベクトルを入れるが、回転や並進で別の関数にならないか確認が必要
 {
+  //Serial.println("calc_necessary_count");// デバッグ用確認  
   //  *target_count_L = distance * encoder_resolution / (2 * wheel_radius_l * PI);
   //  *target_count_R = distance * encoder_resolution / (2 * wheel_radius_r * PI);
 
@@ -172,12 +191,12 @@ void calc_necessary_count(float distance,long int *target_count_L,long int *targ
   //target_count_L = target_L * encoder_resolution;
   //target_count_R = target_R * encoder_resolution;
 
-  Serial.println("distance: " + String(distance));
+  //Serial.println("distance: " + String(distance));
   //Serial.println("distance: " + String(encoder_resolution));
   //Serial.println("2 * wheel_radius_l * PI: " + String(2 * wheel_radius_l * PI));
   //Serial.println("calc: " + String(distance * encoder_resolution / (2 * wheel_radius_l * PI)));
 
-  Serial.println("### target_count_L/R: " + String(*target_count_L) + " / " + String(*target_count_R) + "###");
+  //Serial.println("### target_count_L/R: " + String(*target_count_L) + " / " + String(*target_count_R) + "###");
   //Serial.println("distance: " + String(distance));
   //Serial.println("wheel_radius_l: " + String(wheel_radius_l));
   //Serial.println("PI: " + String(PI));
@@ -187,23 +206,26 @@ void calc_necessary_count(float distance,long int *target_count_L,long int *targ
 }
 
 
-void atamaopen(int *init_current_cmd ,int arduino_cmd_matrix[CMD_SIZE][6],bool cmd_init)
+void atamaopen(bool cmd_init)
 {
-  spi_cmd(6,*init_current_cmd ,arduino_cmd_matrix,cmd_init);
+  Serial.println("atamaopen");// デバッグ用確認  
+  spi_cmd(6,cmd_init);
 }
 
-void atamaclose(int *init_current_cmd ,int arduino_cmd_matrix[CMD_SIZE][6],bool cmd_init)
+void atamaclose(bool cmd_init)
 {
-  spi_cmd(5,*init_current_cmd ,arduino_cmd_matrix,cmd_init);
+  Serial.println("atamaclose");// デバッグ用確認  
+  spi_cmd(5,cmd_init);
 }
 
-void wait_button(int *init_current_cmd ,int arduino_cmd_matrix[CMD_SIZE][6],bool cmd_init)
+void wait_button(bool cmd_init)
 {
   if (cmd_init == false)
   {
 
     if (init_current_cmd >= CMD_SIZE - 1)
     {
+      Serial.println("init_current_cmd: " + String(init_current_cmd));
       Serial.println("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。");
       while (1);
 
@@ -211,8 +233,8 @@ void wait_button(int *init_current_cmd ,int arduino_cmd_matrix[CMD_SIZE][6],bool
     // 初回起動時の処理
     // テスト(ボタンのフラグbutton_enable==1としてテスト）
     // メモリが足りないので、buttonとSPIを共用にする。
-    set_arduino_cmd_matrix(init_current_cmd, EXCEPTION_NO, EXCEPTION_NO, EXCEPTION_NO, 255, 0, 0,arduino_cmd_matrix); // ここではテストで1を使用。
-    *init_current_cmd++;
+    set_arduino_cmd_matrix(EXCEPTION_NO, EXCEPTION_NO, EXCEPTION_NO, 255, 0, 0); // ここではテストで1を使用。//
+    init_current_cmd++;
 
   }
   else
@@ -223,6 +245,8 @@ void wait_button(int *init_current_cmd ,int arduino_cmd_matrix[CMD_SIZE][6],bool
 }
 void display_speed(MotorController motor_controllers[2],bool ENCODER_DISPLAY) // motor_controllers[0] MOTOR_LEFT motor_controllers[1] MOTOR_RIGHT
 {
+  //Serial.println("display_speed");// デバッグ用確認    
+
   if (ENCODER_DISPLAY == true)
   {
     //Serial.println("DISPLAY MOTOR COUNTER & SPEED");
@@ -239,18 +263,20 @@ void display_speed(MotorController motor_controllers[2],bool ENCODER_DISPLAY) //
     Serial.println(String(motor_controllers[1].getCount()));
 
 
-    Serial.print("PID CONTROL RPM(L/R):");
-    Serial.print(motor_controllers[0].getRpm()); // 制御量を見るため。デバッグ用
+    //Serial.print("PID CONTROL RPM(L/R):");
+    //Serial.print(motor_controllers[0].getRpm()); // 制御量を見るため。デバッグ用
     //Serial.print(motor_controllers[0].getSpeed()); // 制御量を見るため。デバッグ用
-    Serial.print(",");
-    Serial.println(motor_controllers[1].getRpm());    //制御量を見るため。デバッグ用
+    //Serial.print(",");
+    //Serial.println(motor_controllers[1].getRpm());    //制御量を見るため。デバッグ用
     //Serial.println(motor_controllers[1].getSpeed());    //制御量を見るため。デバッグ用
 
-    Serial.println(""); // 改行
+    //Serial.println(""); // 改行
   }
 }
 void display_target_rpm(MotorController motor_controllers[2],bool ENCODER_DISPLAY) // motor_controllers[0] MOTOR_LEFT motor_controllers[1] MOTOR_RIGHT
 {   
+  //Serial.println("display_target_rpm");// デバッグ用確認    
+
   if (ENCODER_DISPLAY == true)
   {
   Serial.println("target_rpm[L]:" + String(motor_controllers[0].getTargetRpm()));
@@ -259,6 +285,8 @@ void display_target_rpm(MotorController motor_controllers[2],bool ENCODER_DISPLA
 }
 void display_PID(MotorController motor_controllers[2],bool PID_CONTROLL_DISPLAY) // motor_controllers[0] MOTOR_LEFT motor_controllers[1] MOTOR_RIGHT
 {
+  //Serial.println("display_PID");// デバッグ用確認    
+
   if (PID_CONTROLL_DISPLAY == true)
   {
     Serial.println("DISPLAY PID PRAMETER");
@@ -298,6 +326,7 @@ void display_PID(MotorController motor_controllers[2],bool PID_CONTROLL_DISPLAY)
 
 int split(String data, char delimiter, String *dst)//dstは参照引き渡し
 {
+  Serial.println("split");// デバッグ用確認    
   int index = 0;
   int arraySize = (sizeof(data) / sizeof((data)[0]));
   int datalength = data.length();
@@ -316,20 +345,25 @@ int split(String data, char delimiter, String *dst)//dstは参照引き渡し
 
 void motor_direct_instructions(int left, int right,MotorController motor_controllers[2])// motor_controllers[0] MOTOR_LEFT motor_controllers[1] MOTOR_RIGHT
 {
+  //Serial.print(" motor_direct_instructions:: ");// デバッグ用確認    
   motor_controllers[0].servo_.writeMicroseconds(left);
   motor_controllers[1].servo_.writeMicroseconds(right);
-  //Serial.println("Letf: " + String(left) + ", " + String(right));
+  //Serial.println("l: " + String(left) + ",r " + String(right));
 }
 void rc_mode(volatile unsigned long rcTime[PWM_IN_MAX],MotorController motor_controllers[2])
 {
+  //Serial.print("rc_mode::");// デバッグ用確認    
+
   digitalWrite(LED_BUILTIN, LOW); // RC_MODEでLED消灯
   // 値をそのままへESCへ出力する
   motor_direct_instructions(rcTime[0], rcTime[2],motor_controllers);
-  Serial.println("input cmd:" + String(rcTime[0]) + ", " + String(rcTime[2]));
+  //Serial.println("input cmd:" + String(rcTime[0]) + ", " + String(rcTime[2]));
 }
 
 void stop_motor_immediately(MotorController motor_controllers[2])
 {
+  Serial.println("stop_motor_immediately");// デバッグ用確認    
+
   //set_motorにしないのはセットすることでUDP受け取れないコマンドがリセットされてしまう。
   motor_controllers[0].setTargetRpm(0.0);
   motor_controllers[1].setTargetRpm(0.0);
@@ -338,13 +372,13 @@ void stop_motor_immediately(MotorController motor_controllers[2])
 
 void reset_pid_gain(MotorController motor_controllers[2])
 {
+  //Serial.println("reset_pid_gain");// デバッグ用確認    
+
   for (int i = 0; i < MOTOR_NUM; i++)
   {
     motor_controllers[i].reset_PID_param();
   }
 }
-
-
 
 
 

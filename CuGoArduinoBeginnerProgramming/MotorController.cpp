@@ -53,7 +53,7 @@ void MotorController::driveMotor(){
  
   // サーボに書き込み
   servo_.writeMicroseconds(PULSE_CENTRAL + speed_);
-  Serial.println(String(PULSE_CENTRAL + speed_));
+  //Serial.println(String(speed_));
 
 /**
   Serial.print("driveMotor: ");
@@ -75,8 +75,8 @@ void MotorController::driveMotor(){
 void MotorController::reset_PID_param()
 {
   speed_ = 0;
-  //enc_ = 0;
-  //prev_enc_ = 0;
+  enc_ = 0;//コメント解除 22/10/24
+  prev_enc_ = 0;//コメント解除 22/10/24
   rpm_ = 0.0;
   prev_rpm_ = 0.0;
   target_rpm_ = 0.0;
@@ -203,6 +203,10 @@ void MotorController::calcRpm(){
   }
   
   // RPM 計算
+  //Serial.print("prev_rpm_:" + String(prev_rpm_));
+  //Serial.print("lpf_rate_:" + String(lpf_rate_));
+  //Serial.print("rpm_nolpf:" + String(rpm_nolpf));
+
   rpm_ = prev_rpm_ * lpf_rate_ + rpm_nolpf * (1.0 - lpf_rate_);
   //Serial.println(rpm_);
 
@@ -229,7 +233,11 @@ void MotorController::pidControl(){
 //  Serial.println("i: " + String(i));
 
   // PID制御
-  speed_ = p * kp_ + i * ki_ + d * kd_;
+  //Serial.print("target_rpm_: " + String(target_rpm_));
+  //Serial.print("rpm_: " + String(rpm_));
+  //Serial.print("prev_i_: " + String(prev_i_));
+  //Serial.println("prev_p_: " + String(prev_p_));  
+  speed_ = p * kp_ + i * ki_ + d * kd_;  
   
   // prev_ 更新
   prev_p_ = p;
@@ -283,9 +291,11 @@ float MotorController::limitSpeed(){
   // speed_ を範囲内に調整
   if(speed_ > max_speed_){
     speed_ = max_speed_;
+    //Serial.println("更新+: " + String(speed_));
     return surplus;
   }else if(speed_ < -max_speed_) {
     speed_ = -max_speed_;
+    //Serial.println("更新-: " + String(speed_));
     return surplus;
   } else {
     return 0.0;

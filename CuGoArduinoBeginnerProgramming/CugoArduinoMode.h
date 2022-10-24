@@ -50,6 +50,15 @@
 //const float L_LPF = 0.2;
 //const float R_LPF = 0.2;
 
+// PID位置制御のゲイン調整
+#define L_COUNT_KP  0.008f
+#define L_COUNT_KI  0.00001f
+#define L_COUNT_KD  0.005f
+#define R_COUNT_KP  0.008f
+#define R_COUNT_KI  0.00001f
+#define R_COUNT_KD  0.005f
+
+#define CONTROLL_STOP_count  1000
 
 // Arduinoキットのスタートボタン
 #define CMD_BUTTON_PIN A2 
@@ -75,22 +84,26 @@
 #define PIN_DOWN(no)  time[no] = micros() - upTime[no]
 #define PWM_IN_MAX    3
 
+// グローバル変数宣言
+extern int arduino_cmd_matrix[CMD_SIZE][6];
+extern int init_current_cmd;
 
 
+//各種関数
   void init_SPI();
   void init_KOPROPO(int runMode,int OLD_PWM_IN_PIN0_VALUE,int OLD_PWM_IN_PIN1_VALUE,int OLD_PWM_IN_PIN2_VALUE);
-  void init_ARDUINO_CMD(int arduino_cmd_matrix[CMD_SIZE][6]);
-  void set_arduino_cmd_matrix(int cmd_no, int cmd_0, int cmd_1, int cmd_2, int cmd_3, int cmd_4, int cmd_5,int arduino_cmd_matrix[CMD_SIZE][6]);
+  void init_ARDUINO_CMD();
+  void set_arduino_cmd_matrix(long int cmd_0,long  int cmd_1, int cmd_2, int cmd_3,long int cmd_4,long int cmd_5);
   void send_spi(int mode);
-  void view_arduino_cmd_matrix(int arduino_cmd_matrix[CMD_SIZE][6]);
+  void view_arduino_cmd_matrix();
   void display_failsafe(bool FAIL_SAFE_DISPLAY,int runMode);
   void display_nothing(bool UDP_CONNECTION_DISPLAY,bool ENCODER_DISPLAY,bool PID_CONTROLL_DISPLAY);
-  void spi_cmd(int spi_cmd_value,int *init_current_cmd ,int arduino_cmd_matrix[CMD_SIZE][6],bool cmd_init);
+  void spi_cmd(int spi_cmd_value,bool cmd_init);
   void calc_necessary_rotate(float degree,long int *target_count_L,long int *target_count_R); 
   void calc_necessary_count(float distance,long int *target_count_L,long int *target_count_R); // TODO:ベクトルを入れるが、回転や並進で別の関数にならないか確認が必要
-  void atamaopen(int *init_current_cmd ,int arduino_cmd_matrix[CMD_SIZE][6],bool cmd_init);
-  void atamaclose(int *init_current_cmd ,int arduino_cmd_matrix[CMD_SIZE][6],bool cmd_init);
-  void wait_button(int *init_current_cmd ,int arduino_cmd_matrix[CMD_SIZE][6],bool cmd_init);
+  void atamaopen(bool cmd_init);
+  void atamaclose(bool cmd_init);
+  void wait_button(bool cmd_init);
   void display_speed(MotorController motor_controllers[2],bool ENCODER_DISPLAY);
   void display_target_rpm(MotorController motor_controllers[2],bool ENCODER_DISPLAY);
   void display_PID(MotorController motor_controllers[2],bool PID_CONTROLL_DISPLAY);
@@ -98,7 +111,7 @@
   void motor_direct_instructions(int left, int right,MotorController motor_controllers[2]);
   void rc_mode(volatile unsigned long rcTime[PWM_IN_MAX],MotorController motor_controllers[2]);
   void stop_motor_immediately(MotorController motor_controllers[2]);
-  void wait_time(int milisec,bool cmd_init,int *init_current_cmd,int arduino_cmd_matrix[CMD_SIZE][6] );
+  void wait_time(int milisec,bool cmd_init);
   void reset_pid_gain(MotorController motor_controllers[2]);
 
 #endif
