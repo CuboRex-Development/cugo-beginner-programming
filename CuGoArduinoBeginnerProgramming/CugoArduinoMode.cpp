@@ -3,7 +3,7 @@
 #include "MotorController.h"
 #include <SPI.h>
 
-int arduino_cmd_matrix[CMD_SIZE][6];
+long int arduino_cmd_matrix[CMD_SIZE][6];
 int init_current_cmd = 0;
 
 
@@ -41,7 +41,7 @@ void init_KOPROPO(int runMode,int OLD_PWM_IN_PIN0_VALUE,int OLD_PWM_IN_PIN1_VALU
   delay(100);
 }
 
-void set_arduino_cmd_matrix(long int cmd_0,long int cmd_1,int cmd_2,int cmd_3,long int cmd_4,long int cmd_5)
+void set_arduino_cmd_matrix(long int cmd_0,long int cmd_1,int cmd_2,int cmd_3,int cmd_4,int cmd_5)
 {
   //Serial.println("set_arduino_cmd_matrix()");// デバッグ用確認
   arduino_cmd_matrix[init_current_cmd][0] = cmd_0;
@@ -65,7 +65,7 @@ void init_ARDUINO_CMD()
 
 void view_arduino_cmd_matrix()
 {
-  Serial.println("view_arduino_cmd_matrix");// デバッグ用確認
+  //Serial.println("view_arduino_cmd_matrix");// デバッグ用確認
   for (int i = 0; i < CMD_SIZE; i++)
   {
     Serial.println(arduino_cmd_matrix[i][0]);
@@ -208,13 +208,13 @@ void calc_necessary_count(float distance,long int *target_count_L,long int *targ
 
 void atamaopen(bool cmd_init)
 {
-  Serial.println("atamaopen");// デバッグ用確認  
+  //Serial.println("atamaopen");// デバッグ用確認  
   spi_cmd(6,cmd_init);
 }
 
 void atamaclose(bool cmd_init)
 {
-  Serial.println("atamaclose");// デバッグ用確認  
+  //Serial.println("atamaclose");// デバッグ用確認  
   spi_cmd(5,cmd_init);
 }
 
@@ -225,7 +225,7 @@ void wait_button(bool cmd_init)
 
     if (init_current_cmd >= CMD_SIZE - 1)
     {
-      Serial.println("init_current_cmd: " + String(init_current_cmd));
+      //Serial.println("init_current_cmd: " + String(init_current_cmd));
       Serial.println("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。");
       while (1);
 
@@ -362,7 +362,7 @@ void rc_mode(volatile unsigned long rcTime[PWM_IN_MAX],MotorController motor_con
 
 void stop_motor_immediately(MotorController motor_controllers[2])
 {
-  Serial.println("stop_motor_immediately");// デバッグ用確認    
+  //Serial.println("stop_motor_immediately");// デバッグ用確認    
 
   //set_motorにしないのはセットすることでUDP受け取れないコマンドがリセットされてしまう。
   motor_controllers[0].setTargetRpm(0.0);

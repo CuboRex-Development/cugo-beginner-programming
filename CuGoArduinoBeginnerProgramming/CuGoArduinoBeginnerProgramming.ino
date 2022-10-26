@@ -60,13 +60,6 @@ bool spi_done    = false;
 
 bool end_arduino_mode = false;
 
-int migimawari_count90 = 70;
-int hidarimawari_count90 = 70;
-int migimawari_count45 = 33;
-int hidarimawari_count45 = 33;
-int migimawari_count180 = 160;
-int hidarimawari_count180 = 160;
-
 //// PID位置制御のデータ格納
 float l_count_prev_i_ = 0;
 float l_count_prev_p_ = 0;
@@ -74,7 +67,6 @@ float r_count_prev_i_ = 0;
 float r_count_prev_p_ = 0;
 float l_count_gain = 0;
 float r_count_gain = 0;
-
 
 //割込み処理のためCugoArduinoModeへの移動不可
 // ピン変化割り込みの割り込み #TODO まだコードを畳められていない
@@ -378,7 +370,7 @@ void set_button_cmd()
 //
 void check_achievement_go_forward_cmd()
 {
-  bool L_done = true;//故障のため・・10/24 
+  bool L_done = false;//故障のため・・10/24 
   bool R_done = false;
 
   // L側目標達成チェック// 位置制御とバッティングする　
@@ -422,7 +414,7 @@ void check_achievement_go_forward_cmd()
     Serial.println("R_DONE!");
   }
   //Serial.print("target_count L/R: " + String(target_count_L) + " / " + String(target_count_R));
-  Serial.println("L/R DONE!: " + String(L_done) + " / " + String(R_done));
+  //Serial.println("L/R DONE!: " + String(L_done) + " / " + String(R_done));
 
   // L/R達成していたら終了
   if (L_done == true && R_done == true)
@@ -528,7 +520,7 @@ void cmd_manager()
         //位置制御
         motor_controllers[MOTOR_LEFT].setTargetRpm(l_count_gain);
         motor_controllers[MOTOR_RIGHT].setTargetRpm(r_count_gain);
-        Serial.print("gain:l/r " + String(l_count_gain) + "," + String(r_count_gain));
+        Serial.println("gain:l/r " + String(l_count_gain) + "," + String(r_count_gain));
         /*
        //使うもの
        arduino_cmd_matrix[current_cmd][0] //L側の目標カウント数
@@ -634,7 +626,7 @@ void cmd_end()  // もっとマシな名前を考える
     // while (1);
     if (init_current_cmd >= CMD_SIZE)
     {
-      Serial.println("init_current_cmd: " + String(init_current_cmd));
+      //Serial.println("init_current_cmd: " + String(init_current_cmd));
       Serial.println("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。"); // ココには至らないはず
       while (1);
     }
@@ -666,11 +658,13 @@ void go_forward(float distance)
   if (cmd_init == false)
   {
     // 初回起動時の処理
-    Serial.println("init_current_cmd: " + String(init_current_cmd));
+    //Serial.println("init_current_cmd: " + String(init_current_cmd));
     calc_necessary_count(distance,&target_count_L,&target_count_R);
+    Serial.println("target_count_L/R: " + String(target_count_L) + ", " + String(target_count_R));
     float velocity = 90.0;
     // テスト(L/R +4000カウント必要と固定して全体の動作テスト。実際は↑の関数で計算した必要カウント数を使う）
     set_arduino_cmd_matrix(target_count_L, target_count_R, EXCEPTION_NO, EXCEPTION_NO, velocity, velocity); // ここではテストで4000カウントまで、L/Rともに50rpmで進む。
+    Serial.println("matrix_target_count_L/R: " + String(arduino_cmd_matrix[init_current_cmd][0]) + ", " + String(arduino_cmd_matrix[init_current_cmd][0]));    
     init_current_cmd++;
 
   }
@@ -692,7 +686,7 @@ void go_backward(float distance)
   {
     if (init_current_cmd >= CMD_SIZE - 1)
     {
-      Serial.println("init_current_cmd: " + String(init_current_cmd));
+      //Serial.println("init_current_cmd: " + String(init_current_cmd));
       Serial.println("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。");
       while (1);
     }
@@ -740,7 +734,7 @@ void turn_clockwise(float degree)
   {
     if (init_current_cmd >= CMD_SIZE - 1)
     {
-      Serial.println("init_current_cmd: " + String(init_current_cmd));
+      //Serial.println("init_current_cmd: " + String(init_current_cmd));
       Serial.println("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。");
       while (1);
     }
@@ -787,13 +781,13 @@ void turn_counter_clockwise(float degree)
   {
     if (init_current_cmd >= CMD_SIZE - 1)
     {
-      Serial.println("init_current_cmd: " + String(init_current_cmd));
+      //Serial.println("init_current_cmd: " + String(init_current_cmd));
       Serial.println("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。");
       while (1);
     }
 
     // 初回起動時の処理
-    Serial.println("init_current_cmd: " + String(init_current_cmd));
+    //Serial.println("init_current_cmd: " + String(init_current_cmd));
     calc_necessary_rotate(degree,&target_count_L,&target_count_R);
     float velocity = 90.0; // 単純版関数なので、速度は固定
     // テスト(L/R +4000カウント必要と固定して全体の動作テスト。実際は↑の関数で計算した必要カウント数を使う）
@@ -904,7 +898,7 @@ void CMD_EXECUTE()
 
   button();
 
-  susumu(20.0);
+  susumu(10.0);
   matsu(1000);
   migimawari90();
   matsu(1000);

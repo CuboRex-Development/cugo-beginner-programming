@@ -24,7 +24,7 @@
 #define wheel_radius_r  0.03858f
 #define tread  0.380f
 #define encoder_resolution  2048
-
+#define MAX_MOTOR_RPM 180 //モータの速度上限値
 
 // PID ゲイン調整
 // L側
@@ -52,10 +52,10 @@
 
 // PID位置制御のゲイン調整
 #define L_COUNT_KP  0.008f
-#define L_COUNT_KI  0.00001f
+#define L_COUNT_KI  0.0f //速度上限を設定している場合はiは必ず0に
 #define L_COUNT_KD  0.005f
 #define R_COUNT_KP  0.008f
-#define R_COUNT_KI  0.00001f
+#define R_COUNT_KI  0.0f //速度上限を設定している場合はiは必ず0に
 #define R_COUNT_KD  0.005f
 
 #define CONTROLL_STOP_count  1000
@@ -84,16 +84,26 @@
 #define PIN_DOWN(no)  time[no] = micros() - upTime[no]
 #define PWM_IN_MAX    3
 
+//PID位置制御なしの場合の決め打ちの値
+#define migimawari_count90  70
+#define hidarimawari_count90  70
+#define migimawari_count45  33
+#define hidarimawari_count45  33
+#define migimawari_count180  160
+#define hidarimawari_count180  160
+
+
 // グローバル変数宣言
-extern int arduino_cmd_matrix[CMD_SIZE][6];
+extern long int arduino_cmd_matrix[CMD_SIZE][6];
 extern int init_current_cmd;
+
 
 
 //各種関数
   void init_SPI();
   void init_KOPROPO(int runMode,int OLD_PWM_IN_PIN0_VALUE,int OLD_PWM_IN_PIN1_VALUE,int OLD_PWM_IN_PIN2_VALUE);
   void init_ARDUINO_CMD();
-  void set_arduino_cmd_matrix(long int cmd_0,long  int cmd_1, int cmd_2, int cmd_3,long int cmd_4,long int cmd_5);
+  void set_arduino_cmd_matrix(long int cmd_0,long  int cmd_1, int cmd_2, int cmd_3,int cmd_4,int cmd_5);
   void send_spi(int mode);
   void view_arduino_cmd_matrix();
   void display_failsafe(bool FAIL_SAFE_DISPLAY,int runMode);
