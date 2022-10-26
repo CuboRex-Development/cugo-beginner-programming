@@ -51,12 +51,16 @@
 //const float R_LPF = 0.2;
 
 // PID位置制御のゲイン調整
-#define L_COUNT_KP  0.008f
-#define L_COUNT_KI  0.0f //速度上限を設定している場合はiは必ず0に
-#define L_COUNT_KD  0.005f
-#define R_COUNT_KP  0.008f
-#define R_COUNT_KI  0.0f //速度上限を設定している場合はiは必ず0に
-#define R_COUNT_KD  0.005f
+#define L_COUNT_KP  0.02f
+#define L_COUNT_KI  0.001f 
+#define L_COUNT_KD  0.01f
+#define R_COUNT_KP  0.02f
+#define R_COUNT_KI  0.001f 
+#define R_COUNT_KD  0.01f
+
+#define L_MAX_COUNT_I  9000.0f //速度上限を設定している場合はiは必ず0に
+#define R_MAX_COUNT_I  9000.0f //速度上限を設定している場合はiは必ず0に
+
 
 #define CONTROLL_STOP_count  1000
 

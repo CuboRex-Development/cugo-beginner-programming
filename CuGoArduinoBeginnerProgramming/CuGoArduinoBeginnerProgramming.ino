@@ -68,6 +68,28 @@ float r_count_prev_p_ = 0;
 float l_count_gain = 0;
 float r_count_gain = 0;
 
+//プロトタイプ宣言
+void susumu(float distance);//前方移動距離のみ指定 速度はデフォルト値
+void susumu(float distance,float max_velocity);//前方移動距離と速度指定
+void sagaru(float distance);//後方移動距離のみ指定 速度はデフォルト値
+void sagaru(float distance,float max_velocity);//後方移動距離と速度のみ指定
+void migimawari(float degree);
+void migimawari(float degree,float max_velocity);
+void migimawari90();
+void migimawari90(float max_velocity);
+void migimawari45();
+void migimawari45(float max_velocity);
+void migimawari180();
+void migimawari180(float max_velocity);
+void hidarimawari(float degree);
+void hidarimawari(float degree,float max_velocity);
+void hidarimawari90();
+void hidarimawari90(float max_velocity);
+void hidarimawari45();
+void hidarimawari45(float max_velocity);
+void hidarimawari180();
+void hidarimawari180(float max_velocity);
+
 //割込み処理のためCugoArduinoModeへの移動不可
 // ピン変化割り込みの割り込み #TODO まだコードを畳められていない
 ISR(PCINT2_vect)
@@ -508,6 +530,18 @@ void cmd_manager()
         r_count_p = arduino_cmd_matrix[current_cmd][1] - motor_controllers[MOTOR_RIGHT].getCount();
         r_count_i = r_count_prev_i_ + r_count_p;
         r_count_d = r_count_p - r_count_prev_p_;
+
+        l_count_i = min( max(l_count_i,-L_MAX_COUNT_I),L_MAX_COUNT_I);        
+        r_count_i = min( max(r_count_i,-R_MAX_COUNT_I),R_MAX_COUNT_I);
+/*
+        if(r_count_i > R_MAX_COUNT_I){
+          r_count_i = R_MAX_COUNT_I;
+        }else if(r_count_i < -R_MAX_COUNT_I){
+          r_count_i = -R_MAX_COUNT_I;
+        }else{
+          //通常ループ
+        }
+ */      
         // PID制御
         l_count_gain = l_count_p * L_COUNT_KP + l_count_i * L_COUNT_KI + l_count_d * L_COUNT_KD;  
         r_count_gain = r_count_p * R_COUNT_KP + r_count_i * R_COUNT_KI + r_count_d * R_COUNT_KD;  
@@ -516,6 +550,12 @@ void cmd_manager()
         l_count_prev_i_ = l_count_i;
         r_count_prev_p_ = r_count_p;
         r_count_prev_i_ = r_count_i;
+
+        l_count_gain = min( max(l_count_gain,-MAX_MOTOR_RPM),MAX_MOTOR_RPM);//モーターの速度上限        
+        r_count_gain = min( max(r_count_gain,-MAX_MOTOR_RPM),MAX_MOTOR_RPM);//モーターの速度上限        
+        l_count_gain = min( max(l_count_gain,-arduino_cmd_matrix[current_cmd][4]),arduino_cmd_matrix[current_cmd][4]);//ユーザ設定の速度上限        
+        r_count_gain = min( max(l_count_gain,-arduino_cmd_matrix[current_cmd][5]),arduino_cmd_matrix[current_cmd][5]);//ユーザ設定の速度上限        
+
            
         //位置制御
         motor_controllers[MOTOR_LEFT].setTargetRpm(l_count_gain);
@@ -650,10 +690,15 @@ void cmd_end()  // もっとマシな名前を考える
 //退避しないでよい？
 void susumu(float distance)
 {
-  go_forward(distance);
+  go_forward(distance,EXCEPTION_NO);
 }
+void susumu(float distance,float max_velocity){
+  go_forward(distance,max_velocity);
+  
+}
+
 //要退避
-void go_forward(float distance)
+void go_forward(float distance,float max_velocity)
 {
   if (cmd_init == false)
   {
@@ -661,10 +706,16 @@ void go_forward(float distance)
     //Serial.println("init_current_cmd: " + String(init_current_cmd));
     calc_necessary_count(distance,&target_count_L,&target_count_R);
     Serial.println("target_count_L/R: " + String(target_count_L) + ", " + String(target_count_R));
-    float velocity = 90.0;
+    float velocity = 0.0;
+    if(max_velocity == EXCEPTION_NO)
+    {
+      velocity = 90.0;
+      }else{
+      velocity = max_velocity;
+    }
     // テスト(L/R +4000カウント必要と固定して全体の動作テスト。実際は↑の関数で計算した必要カウント数を使う）
     set_arduino_cmd_matrix(target_count_L, target_count_R, EXCEPTION_NO, EXCEPTION_NO, velocity, velocity); // ここではテストで4000カウントまで、L/Rともに50rpmで進む。
-    Serial.println("matrix_target_count_L/R: " + String(arduino_cmd_matrix[init_current_cmd][0]) + ", " + String(arduino_cmd_matrix[init_current_cmd][0]));    
+    //Serial.println("matrix_target_count_L/R: " + String(arduino_cmd_matrix[init_current_cmd][0]) + ", " + String(arduino_cmd_matrix[init_current_cmd][0]));    
     init_current_cmd++;
 
   }
@@ -677,10 +728,15 @@ void go_forward(float distance)
 //退避しないでよい？
 void sagaru(float distance)
 {
-  go_backward(distance);
+  go_backward(distance,EXCEPTION_NO);
 }
+void sagaru(float distance,float max_velocity){
+  go_backward(distance,max_velocity);
+  
+}
+
 //要退避
-void go_backward(float distance)
+void go_backward(float distance,float max_velocity)
 {
   if (cmd_init == false)
   {
@@ -694,7 +750,14 @@ void go_backward(float distance)
     // 初回起動時の処理
     //Serial.println("init_current_cmd: " + String(init_current_cmd));
     calc_necessary_count(distance,&target_count_L,&target_count_R);
-    float velocity = 90.0;
+    Serial.println("target_count_L/R: " + String(-target_count_L) + ", " + String(-target_count_R));
+    float velocity = 0.0;
+    if(max_velocity == EXCEPTION_NO)
+    {
+      velocity = 90.0;
+      }else{
+      velocity = max_velocity;
+    }
     // テスト(L/R +4000カウント必要と固定して全体の動作テスト。実際は↑の関数で計算した必要カウント数を使う）
     set_arduino_cmd_matrix(-target_count_L, -target_count_R, EXCEPTION_NO, EXCEPTION_NO, -velocity, -velocity); // ここではテストで4000カウントまで、L/Rともに50rpmで進む。
     init_current_cmd++;
@@ -709,25 +772,39 @@ void go_backward(float distance)
 //退避しないでよい？
 void migimawari(float degree)
 {
-  turn_clockwise(degree);
+  turn_clockwise(degree,EXCEPTION_NO);
 }
-//退避しないでよい？
+void migimawari(float degree,float max_velocity)
+{
+  turn_clockwise(degree,max_velocity);
+}
 void migimawari90()
 {
-  migimawari(migimawari_count90);
+  migimawari(migimawari_count90,EXCEPTION_NO);
 }
-//退避しないでよい？
+void migimawari90(float max_velocity)
+{
+  migimawari(migimawari_count90,max_velocity);
+}
 void migimawari45()
 {
-  migimawari(migimawari_count45);
+  migimawari(migimawari_count45,EXCEPTION_NO);
 }
-//退避しないでよい？
+void migimawari45(float max_velocity)
+{
+  migimawari(migimawari_count45,max_velocity);
+}
 void migimawari180()
 {
-  migimawari(migimawari_count180);
+  migimawari(migimawari_count180,EXCEPTION_NO);
 }
+void migimawari180(float max_velocity)
+{
+  migimawari(migimawari_count180,max_velocity);
+}
+
 //要退避
-void turn_clockwise(float degree)
+void turn_clockwise(float degree,float max_velocity)
 {
 
   if (cmd_init == false)
@@ -742,11 +819,18 @@ void turn_clockwise(float degree)
     // 初回起動時の処理
     //Serial.println("init_current_cmd: " + String(init_current_cmd));
     calc_necessary_rotate(degree,&target_count_L,&target_count_R);
-    float velocity = 90.0;
+    Serial.println("target_count_L/R: " + String(target_count_L) + ", " + String(target_count_R));
+
+    float velocity = 0.0;
+     if(max_velocity == EXCEPTION_NO)
+    {
+      velocity = 90.0;
+      }else{
+      velocity = max_velocity;
+    }   
     // テスト(L/R +4000カウント必要と固定して全体の動作テスト。実際は↑の関数で計算した必要カウント数を使う）
     set_arduino_cmd_matrix(target_count_L, target_count_R, EXCEPTION_NO, EXCEPTION_NO, velocity, -velocity); // ここではテストで4000カウントまで、L/Rともに50rpmで進む。
     init_current_cmd++;
-
   }
   else
   {
@@ -754,28 +838,43 @@ void turn_clockwise(float degree)
 
   }
 }
+
 //退避しないでよい？
 void hidarimawari(float degree)
 {
-  turn_counter_clockwise(degree);
+  turn_counter_clockwise(degree,EXCEPTION_NO);
 }
-//退避しないでよい？
+void hidarimawari(float degree,float max_velocity)
+{
+  turn_counter_clockwise(degree,max_velocity);
+}
 void hidarimawari90()
 {
-  hidarimawari(hidarimawari_count90);
+  hidarimawari(hidarimawari_count90,EXCEPTION_NO);
 }
-//退避しないでよい？
+void hidarimawari90(float max_velocity)
+{
+  hidarimawari(hidarimawari_count90,max_velocity);
+}
 void hidarimawari45()
 {
-  hidarimawari(hidarimawari_count45);
+  hidarimawari(hidarimawari_count45,EXCEPTION_NO);
 }
-//退避しないでよい？
+void hidarimawari45(float max_velocity)
+{
+  hidarimawari(hidarimawari_count45,max_velocity);
+}
 void hidarimawari180()
 {
-  hidarimawari(hidarimawari_count180);
+  hidarimawari(hidarimawari_count180,EXCEPTION_NO);
 }
+void hidarimawari180(float max_velocity)
+{
+  hidarimawari(hidarimawari_count180,max_velocity);
+}
+
 //要退避
-void turn_counter_clockwise(float degree)
+void turn_counter_clockwise(float degree,float max_velocity)
 {
   if (cmd_init == false)
   {
@@ -789,7 +888,15 @@ void turn_counter_clockwise(float degree)
     // 初回起動時の処理
     //Serial.println("init_current_cmd: " + String(init_current_cmd));
     calc_necessary_rotate(degree,&target_count_L,&target_count_R);
-    float velocity = 90.0; // 単純版関数なので、速度は固定
+    Serial.println("target_count_L/R: " + String(-target_count_L) + ", " + String(-target_count_R));
+
+    float velocity = 0.0;
+    if(max_velocity == EXCEPTION_NO)
+    {
+      velocity = 90.0;
+      }else{
+      velocity = max_velocity;
+    }   
     // テスト(L/R +4000カウント必要と固定して全体の動作テスト。実際は↑の関数で計算した必要カウント数を使う）
     set_arduino_cmd_matrix(-target_count_L, -target_count_R, EXCEPTION_NO, EXCEPTION_NO, -velocity, velocity); // ここではテストで4000カウントまで、L/Rともに50rpmで進む。
     init_current_cmd++;
@@ -898,25 +1005,27 @@ void CMD_EXECUTE()
 
   button();
 
-  susumu(10.0);
+  susumu(5.0);
+  matsu(1000); 
+  susumu(2.0,150);
   matsu(1000);
-  migimawari90();
-  matsu(1000);
-
-  susumu(1.0);
-  matsu(1000);
-  migimawari90();
+  migimawari90(180);
   matsu(1000);
 
-  susumu(1.0);
+  sagaru(1.0,30);
   matsu(1000);
-  migimawari90();
+  migimawari(30,60);
   matsu(1000);
 
-  susumu(1.0);
+  sagaru(2.0);
   matsu(1000);
-  migimawari90();
+  hidarimawari90(10);
   matsu(1000);
+
+  //susumu(1.0);
+  //matsu(1000);
+  //migimawari90();
+  //matsu(1000);
   // ここから↑を改造していこう！
 
   cmd_end();      // おまじない
