@@ -553,8 +553,8 @@ void cmd_manager()
 
         l_count_gain = min( max(l_count_gain,-MAX_MOTOR_RPM),MAX_MOTOR_RPM);//モーターの速度上限        
         r_count_gain = min( max(r_count_gain,-MAX_MOTOR_RPM),MAX_MOTOR_RPM);//モーターの速度上限        
-        l_count_gain = min( max(l_count_gain,-arduino_cmd_matrix[current_cmd][4]),arduino_cmd_matrix[current_cmd][4]);//ユーザ設定の速度上限        
-        r_count_gain = min( max(l_count_gain,-arduino_cmd_matrix[current_cmd][5]),arduino_cmd_matrix[current_cmd][5]);//ユーザ設定の速度上限        
+        l_count_gain = min( max(l_count_gain,-fabsf(arduino_cmd_matrix[current_cmd][4])),fabsf(arduino_cmd_matrix[current_cmd][4]));//ユーザ設定の速度上限        
+        r_count_gain = min( max(r_count_gain,-fabsf(arduino_cmd_matrix[current_cmd][5])),fabsf(arduino_cmd_matrix[current_cmd][5]));//ユーザ設定の速度上限        
 
            
         //位置制御
@@ -780,27 +780,27 @@ void migimawari(float degree,float max_velocity)
 }
 void migimawari90()
 {
-  migimawari(migimawari_count90,EXCEPTION_NO);
+  migimawari(90,EXCEPTION_NO);
 }
 void migimawari90(float max_velocity)
 {
-  migimawari(migimawari_count90,max_velocity);
+  migimawari(90,max_velocity);
 }
 void migimawari45()
 {
-  migimawari(migimawari_count45,EXCEPTION_NO);
+  migimawari(45,EXCEPTION_NO);
 }
 void migimawari45(float max_velocity)
 {
-  migimawari(migimawari_count45,max_velocity);
+  migimawari(45,max_velocity);
 }
 void migimawari180()
 {
-  migimawari(migimawari_count180,EXCEPTION_NO);
+  migimawari(180,EXCEPTION_NO);
 }
 void migimawari180(float max_velocity)
 {
-  migimawari(migimawari_count180,max_velocity);
+  migimawari(180,max_velocity);
 }
 
 //要退避
@@ -850,27 +850,27 @@ void hidarimawari(float degree,float max_velocity)
 }
 void hidarimawari90()
 {
-  hidarimawari(hidarimawari_count90,EXCEPTION_NO);
+  hidarimawari(90,EXCEPTION_NO);
 }
 void hidarimawari90(float max_velocity)
 {
-  hidarimawari(hidarimawari_count90,max_velocity);
+  hidarimawari(90,max_velocity);
 }
 void hidarimawari45()
 {
-  hidarimawari(hidarimawari_count45,EXCEPTION_NO);
+  hidarimawari(45,EXCEPTION_NO);
 }
 void hidarimawari45(float max_velocity)
 {
-  hidarimawari(hidarimawari_count45,max_velocity);
+  hidarimawari(45,max_velocity);
 }
 void hidarimawari180()
 {
-  hidarimawari(hidarimawari_count180,EXCEPTION_NO);
+  hidarimawari(180,EXCEPTION_NO);
 }
 void hidarimawari180(float max_velocity)
 {
-  hidarimawari(hidarimawari_count180,max_velocity);
+  hidarimawari(180,max_velocity);
 }
 
 //要退避
@@ -1007,20 +1007,23 @@ void CMD_EXECUTE()
 
   susumu(5.0);
   matsu(1000); 
-  susumu(2.0,150);
+  susumu(4.0,150);
+  matsu(1000);
+  migimawari90();
   matsu(1000);
   migimawari90(180);
   matsu(1000);
-
   sagaru(1.0,30);
   matsu(1000);
   migimawari(30,60);
   matsu(1000);
-
   sagaru(2.0);
   matsu(1000);
   hidarimawari90(10);
   matsu(1000);
+  //hidarimawari90();
+  //matsu(1000);
+
 
   //susumu(1.0);
   //matsu(1000);
