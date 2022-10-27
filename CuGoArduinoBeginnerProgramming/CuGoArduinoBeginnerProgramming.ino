@@ -24,7 +24,7 @@ const bool R_reverse = true;
 unsigned long long current_time = 0, prev_time_10ms = 0, prev_time_100ms, prev_time_1000ms; // オーバーフローしても問題ないが64bit確保
 
 MotorController motor_controllers[2];//利用するモータの数（インスタンス化するオブジェクト数）
-
+//
 
 /*    // メモリがカツカツになったときに死ぬ。
   typedef enum {
