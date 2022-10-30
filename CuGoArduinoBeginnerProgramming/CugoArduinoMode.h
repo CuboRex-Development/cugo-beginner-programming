@@ -101,6 +101,21 @@
 extern long int arduino_cmd_matrix[CMD_SIZE][6];
 extern int init_current_cmd;
 
+extern long int target_count_L;
+extern long int target_count_R;
+extern long int target_wait_time;
+extern int button_push_count;
+extern bool button_enable;
+extern bool cmd_init;
+extern int current_cmd;
+extern bool cmd_L_back;
+extern bool cmd_R_back;
+extern bool cmd_exec;
+extern bool count_done;
+extern bool wait_done;
+extern bool button_done;
+extern bool spi_done;
+extern bool end_arduino_mode;
 
 
 //各種関数
@@ -112,12 +127,14 @@ extern int init_current_cmd;
   void view_arduino_cmd_matrix();
   void display_failsafe(bool FAIL_SAFE_DISPLAY,int runMode);
   void display_nothing(bool UDP_CONNECTION_DISPLAY,bool ENCODER_DISPLAY,bool PID_CONTROLL_DISPLAY);
-  void spi_cmd(int spi_cmd_value,bool cmd_init);
-  void calc_necessary_rotate(float degree,long int *target_count_L,long int *target_count_R); 
-  void calc_necessary_count(float distance,long int *target_count_L,long int *target_count_R); // TODO:ベクトルを入れるが、回転や並進で別の関数にならないか確認が必要
-  void atamaopen(bool cmd_init);
-  void atamaclose(bool cmd_init);
-  void wait_button(bool cmd_init);
+  void spi_cmd(int spi_cmd_value);
+  void calc_necessary_rotate(float degree); 
+  void calc_necessary_count(float distance); // TODO:ベクトルを入れるが、回転や並進で別の関数にならないか確認が必要
+  void atamaopen();
+  void atamaclose();
+  void wait_button();
+  void botan();
+  void button();
   void display_speed(MotorController motor_controllers[2],bool ENCODER_DISPLAY);
   void display_target_rpm(MotorController motor_controllers[2],bool ENCODER_DISPLAY);
   void display_PID(MotorController motor_controllers[2],bool PID_CONTROLL_DISPLAY);
@@ -125,7 +142,42 @@ extern int init_current_cmd;
   void motor_direct_instructions(int left, int right,MotorController motor_controllers[2]);
   void rc_mode(volatile unsigned long rcTime[PWM_IN_MAX],MotorController motor_controllers[2]);
   void stop_motor_immediately(MotorController motor_controllers[2]);
-  void wait_time(int milisec,bool cmd_init);
+  void set_wait_time_cmd();
+  void wait_time(int milisec);
+  void matsu(int milisec);
+  void matu(int milisec);
   void reset_pid_gain(MotorController motor_controllers[2]);
+  void set_button_cmd();
+  void go_backward(float distance,float max_velocity);
+  void sagaru(float distance);
+  void sagaru(float distance,float max_velocity);
+  void turn_clockwise(float degree,float max_velocity);
+  void migimawari(float degree);
+  void migimawari(float degree,float max_velocity);
+  void migimawari90();
+  void migimawari90(float max_velocity);
+  void migimawari45();
+  void migimawari45(float max_velocity);
+  void migimawari180();
+  void migimawari180(float max_velocity);
+  void go_forward(float distance,float max_velocity);
+  void susumu(float distance);
+  void susumu(float distance,float max_velocity);
+  void turn_counter_clockwise(float degree,float max_velocity);
+  void hidarimawari(float degree);
+  void hidarimawari(float degree,float max_velocity);
+  void hidarimawari90();
+  void hidarimawari90(float max_velocity);
+  void hidarimawari45();
+  void hidarimawari45(float max_velocity);
+  void hidarimawari180();
+  void hidarimawari180(float max_velocity);
+  void reset_arduino_mode_flags();
+  void set_go_forward_cmd(MotorController motor_controllers[2]);
+  void view_flags();
+  void check_achievement_spi_cmd();
+  void cmd_end(MotorController motor_controllers[2]);
+  void check_achievement_wait_time_cmd(MotorController motor_controllers[2]);
+  void cmd_manager_flags_init(MotorController motor_controllers[2]);  
 
 #endif
