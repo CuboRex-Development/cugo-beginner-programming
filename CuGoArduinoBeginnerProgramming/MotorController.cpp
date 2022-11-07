@@ -23,7 +23,7 @@ MotorController::MotorController(int enc_pin_a, int enc_pin_b, int servo_pin, in
   // 変数の初期化
   speed_ = 0;
   enc_ = 0;
-//  enc_rotation_ = 0;    //22/8/2追加
+//  enc_rotation_ = 0;    //22/8/2追加 //★元ファイルからの変更箇所　バグFIX対応：モード切替時のびくつき
   prev_enc_ = 0;
   rpm_ = 0.0;
   prev_rpm_ = 0.0;
@@ -75,8 +75,8 @@ void MotorController::driveMotor(){
 void MotorController::reset_PID_param()
 {
   speed_ = 0;
-  enc_ = 0;//コメント解除 22/10/24
-  prev_enc_ = 0;//コメント解除 22/10/24
+  enc_ = 0;//コメント解除 22/10/24　//★元ファイルからの変更箇所　バグFIX対応：モード切替時のびくつき
+  prev_enc_ = 0;//コメント解除 22/10/24　//★元ファイルからの変更箇所　バグFIX対応：モード切替時のびくつき
   rpm_ = 0.0;
   prev_rpm_ = 0.0;
   target_rpm_ = 0.0;

@@ -195,7 +195,7 @@ void job_10ms()
   check_mode_change();
 }
 
-//可用性を考えるとjobは退避すべきではない？
+//可用性を考えるとjobは退避すべきではない？//★利用するとグローバル変数圧迫される
 void job_100ms()
 {
   //check_failsafe();存在しない関数
@@ -204,7 +204,7 @@ void job_100ms()
   //display_PID(motor_controllers,PID_CONTROLL_DISPLAY);
   //display_failsafe(FAIL_SAFE_DISPLAY,runMode);
 }
-//可用性を考えるとjobは退避すべきではない？
+//可用性を考えるとjobは退避すべきではない？//★利用するとグローバル変数圧迫される
 void job_1000ms()
 {
   //display_nothing(UDP_CONNECTION_DISPLAY,ENCODER_DISPLAY,PID_CONTROLL_DISPLAY);

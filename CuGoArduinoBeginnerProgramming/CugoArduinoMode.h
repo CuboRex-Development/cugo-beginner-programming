@@ -1,4 +1,10 @@
 // CugoArduinoBeginnerProguramingのリファクタリングプログラム
+/* ★　元ファイルからの変更箇所概要
+ * 各関数や定数変数のファイル移行
+ * グローバル変数利用時の引数は一部参照渡しに変更　
+ * set_arduino_cmd_matrixのinit_current_cmdは参照渡しへ変更
+ * motor_controllersを引数に追加
+*/
 
 #ifndef CUGOARDUINOMODE_H
 #define CUGOARDUINOMODE_H
@@ -28,6 +34,7 @@
 
 // PID ゲイン調整
 // L側
+// 元ファイルからの★変更箇所　const floatからdefineへ
 #define L_KP   1.0f   //CuGoV3
 #define L_KI   0.02f   //CuGoV3
 #define L_KD   0.1f   //CuGoV3
@@ -88,7 +95,7 @@
 #define PIN_DOWN(no)  time[no] = micros() - upTime[no]
 #define PWM_IN_MAX    3
 
-//PID位置制御なしの場合の決め打ちの値
+//PID位置制御なしの場合の決め打ちの値 //現在は使ってない★
 #define migimawari_count90  70
 #define hidarimawari_count90  70
 #define migimawari_count45  33
@@ -122,7 +129,7 @@ extern bool end_arduino_mode;
   void init_SPI();
   void init_KOPROPO(int runMode,int OLD_PWM_IN_PIN0_VALUE,int OLD_PWM_IN_PIN1_VALUE,int OLD_PWM_IN_PIN2_VALUE);
   void init_ARDUINO_CMD();
-  void set_arduino_cmd_matrix(long int cmd_0,long  int cmd_1, int cmd_2, int cmd_3,int cmd_4,int cmd_5);
+  void set_arduino_cmd_matrix(long int cmd_0,long  int cmd_1, int cmd_2, int cmd_3,int cmd_4,int cmd_5);//★init_current_cmdは参照渡しへ
   void send_spi(int mode);
   void view_arduino_cmd_matrix();
   void display_failsafe(bool FAIL_SAFE_DISPLAY,int runMode);
@@ -135,7 +142,7 @@ extern bool end_arduino_mode;
   void wait_button();
   void botan();
   void button();
-  void display_speed(MotorController motor_controllers[2],bool ENCODER_DISPLAY);
+  void display_speed(MotorController motor_controllers[2],bool ENCODER_DISPLAY); 
   void display_target_rpm(MotorController motor_controllers[2],bool ENCODER_DISPLAY);
   void display_PID(MotorController motor_controllers[2],bool PID_CONTROLL_DISPLAY);
   int split(String data, char delimiter, String *dst);
