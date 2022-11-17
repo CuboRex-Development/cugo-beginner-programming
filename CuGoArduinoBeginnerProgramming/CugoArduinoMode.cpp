@@ -3,7 +3,8 @@
 #include "MotorController.h"
 #include <SPI.h>
 
-long int arduino_cmd_matrix[CMD_SIZE][6];
+long int arduino_count_cmd_matrix[CMD_SIZE][2];
+int arduino_flag_cmd_matrix[CMD_SIZE][4];
 int init_current_cmd = 0;
 
 long int target_count_L = 0;
@@ -21,18 +22,21 @@ bool wait_done   = false;
 bool button_done = false;
 bool spi_done    = false;
 bool end_arduino_mode = false;
-
+unsigned long long current_time = 0; // オーバーフローしても問題ないが64bit確保
+unsigned long long prev_time_10ms = 0; // オーバーフローしても問題ないが64bit確保
+unsigned long long prev_time_100ms = 0; // オーバーフローしても問題ないが64bit確保
+unsigned long long prev_time_1000ms = 0; // オーバーフローしても問題ないが64bit確保
 
 
 void init_SPI()
 {
-  Serial.println("init_SPI()");// デバッグ用確認
+  Serial.println(F("init_SPI()"));// デバッグ用確認
   SPI.begin();
   digitalWrite(SS, HIGH);
 }
 
 void send_spi(int mode) {
-  Serial.println("send_spi()");// デバッグ用確認
+  Serial.println(F("send_spi()"));// デバッグ用確認
   digitalWrite(SS, LOW);
   SPI.transfer(mode);
   digitalWrite(SS, HIGH);
@@ -40,7 +44,7 @@ void send_spi(int mode) {
 
 void init_KOPROPO(int runMode,int OLD_PWM_IN_PIN0_VALUE,int OLD_PWM_IN_PIN1_VALUE,int OLD_PWM_IN_PIN2_VALUE)
 {
-  Serial.println("init_KOPROPO()");// デバッグ用確認
+  Serial.println(F("init_KOPROPO()"));// デバッグ用確認
   // ピン変化割り込みの初期状態保存
   runMode = RC_MODE;
   OLD_PWM_IN_PIN0_VALUE = digitalRead(PWM_IN_PIN0);
@@ -61,12 +65,14 @@ void init_KOPROPO(int runMode,int OLD_PWM_IN_PIN0_VALUE,int OLD_PWM_IN_PIN1_VALU
 void set_arduino_cmd_matrix(long int cmd_0,long int cmd_1,int cmd_2,int cmd_3,int cmd_4,int cmd_5)
 {
   //Serial.println("set_arduino_cmd_matrix()");// デバッグ用確認
-  arduino_cmd_matrix[init_current_cmd][0] = cmd_0;
-  arduino_cmd_matrix[init_current_cmd][1] = cmd_1;
-  arduino_cmd_matrix[init_current_cmd][2] = cmd_2;
-  arduino_cmd_matrix[init_current_cmd][3] = cmd_3;
-  arduino_cmd_matrix[init_current_cmd][4] = cmd_4;
-  arduino_cmd_matrix[init_current_cmd][5] = cmd_5;
+  
+  arduino_count_cmd_matrix[init_current_cmd][0] = cmd_0;
+  arduino_count_cmd_matrix[init_current_cmd][1] = cmd_1;
+  arduino_flag_cmd_matrix[init_current_cmd][0] = cmd_2;
+  arduino_flag_cmd_matrix[init_current_cmd][1] = cmd_3;
+  arduino_flag_cmd_matrix[init_current_cmd][2] = cmd_4;
+  arduino_flag_cmd_matrix[init_current_cmd][3] = cmd_5;
+  
 }
 
 void init_ARDUINO_CMD()
@@ -85,12 +91,12 @@ void view_arduino_cmd_matrix()
   //Serial.println("view_arduino_cmd_matrix");// デバッグ用確認
   for (int i = 0; i < CMD_SIZE; i++)
   {
-    Serial.println(arduino_cmd_matrix[i][0]);
-    Serial.println(arduino_cmd_matrix[i][1]);
-    Serial.println(arduino_cmd_matrix[i][2]);
-    Serial.println(arduino_cmd_matrix[i][3]);
-    Serial.println(arduino_cmd_matrix[i][4]);
-    Serial.println(arduino_cmd_matrix[i][5]);
+    Serial.println(arduino_count_cmd_matrix[i][0]);
+    Serial.println(arduino_count_cmd_matrix[i][1]);
+    Serial.println(arduino_flag_cmd_matrix[i][0]);
+    Serial.println(arduino_flag_cmd_matrix[i][1]);
+    Serial.println(arduino_flag_cmd_matrix[i][2]);
+    Serial.println(arduino_flag_cmd_matrix[i][3]);
     Serial.println(i);
   }
   //while (1); //matrixの内容を見たいだけ
@@ -101,15 +107,16 @@ void display_failsafe(bool FAIL_SAFE_DISPLAY,int runMode)
   //Serial.println("display_failsafe");// デバッグ用確認
   if (FAIL_SAFE_DISPLAY == true)
   {
-    Serial.println("DISPLAY FAIL SAFE PARAM");
-
-    Serial.print("Mode(ARDUINO/RC): ");
+//    Serial.println("DISPLAY FAIL SAFE PARAM");
+    Serial.println(F("DISPLAY FAIL SAFE PARAM"));    
+    
+    Serial.print(F("Mode(ARDUINO/RC): "));
     Serial.println(runMode);
 
-    Serial.print("UDP recieve fail count: ");
+    Serial.print(F("UDP recieve fail count: "));
     //    Serial.println(UDP_FAIL_COUNT);
 
-    Serial.println("");
+    Serial.println(F(""));
   }
 }
 
@@ -118,22 +125,23 @@ void display_nothing(bool UDP_CONNECTION_DISPLAY,bool ENCODER_DISPLAY,bool PID_C
   //Serial.println("display_nothing");// デバッグ用確認
   if (UDP_CONNECTION_DISPLAY == false && ENCODER_DISPLAY == false && PID_CONTROLL_DISPLAY == false)
   {
-    Serial.println("Display item not set");
-    Serial.println("Arduino is working...");
-    Serial.println("");
+    Serial.println(F("Display item not set"));
+    Serial.println(F("Arduino is working..."));
+    Serial.println(F(""));
   }
 }
 
 void spi_cmd(int spi_cmd_value)
 {
-  Serial.println("spi_cmd");// デバッグ用確認
+  Serial.println(F("spi_cmd"));// デバッグ用確認
   if (cmd_init == false)
   {
 
     if (init_current_cmd >= CMD_SIZE - 1)
     {
-      Serial.println("init_current_cmd: " + String(init_current_cmd));
-      Serial.println("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。");
+      Serial.print(F("init_current_cmd: "));
+      Serial.println(String(init_current_cmd));
+      Serial.println(F("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。"));
       while (1);
 
     }
@@ -153,9 +161,9 @@ void spi_cmd(int spi_cmd_value)
 
 void set_wait_time_cmd()
 {
-  //target_wait_time = micros() + arduino_cmd_matrix[current_cmd][2] * 1000;
-  target_wait_time = arduino_cmd_matrix[current_cmd][2];
-  target_wait_time = target_wait_time * 1000; // arduino_cmd_matrix[][]が16bitのため、long intのこちらで1000倍処理
+  //target_wait_time = micros() + arduino_flag_cmd_matrix[current_cmd][0] * 1000;
+  target_wait_time = arduino_flag_cmd_matrix[current_cmd][0];
+  target_wait_time = target_wait_time * 1000; // こちらで1000倍処理
   target_wait_time = target_wait_time + micros();
   //   Serial.println(String(target_wait_time));
   // while(1);
@@ -170,8 +178,9 @@ void wait_time(int milisec)
 
     if (init_current_cmd >= CMD_SIZE - 1)
     {
-      Serial.println("init_current_cmd: " + String(init_current_cmd));
-      Serial.println("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。");
+      Serial.print(F("init_current_cmd: ")); 
+      Serial.println(String(init_current_cmd));
+      Serial.println(F("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。"));
       while (1);
     }
 
@@ -264,7 +273,7 @@ void wait_button()
     if (init_current_cmd >= CMD_SIZE - 1)
     {
       //Serial.println("init_current_cmd: " + String(init_current_cmd));
-      Serial.println("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。");
+      Serial.println(F("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。"));
       while (1);
 
     }
@@ -302,11 +311,11 @@ void display_speed(MotorController motor_controllers[2],bool ENCODER_DISPLAY) //
     //Serial.print("Mode:");
     //Serial.println(runMode);
 
-    Serial.print("Encoder count (L/R):");
+    Serial.print(F("Encoder count (L/R):"));
     //Serial.print(motor_controllers[0].getRpm());   // 制御量を見るため。開発用
     //Serial.print(motor_controllers[0].getSpeed()); // 制御量を見るため。開発用
     Serial.print(String(motor_controllers[0].getCount()));
-    Serial.print(",");
+    Serial.print(F(","));
     //Serial.println(motor_controllers[1].getRpm());    //制御量を見るため。デバッグ用
     //Serial.println(motor_controllers[1].getSpeed());  //制御量を見るため。デバッグ用
     Serial.println(String(motor_controllers[1].getCount()));
@@ -328,8 +337,10 @@ void display_target_rpm(MotorController motor_controllers[2],bool ENCODER_DISPLA
 
   if (ENCODER_DISPLAY == true)
   {
-  Serial.println("target_rpm[L]:" + String(motor_controllers[0].getTargetRpm()));
-  Serial.println("target_rpm[R]:" + String(motor_controllers[1].getTargetRpm()));
+  Serial.print(F("target_rpm[L]:"));
+  Serial.println(String(motor_controllers[0].getTargetRpm()));
+  Serial.print(F("target_rpm[R]:"));
+  Serial.println(String(motor_controllers[1].getTargetRpm()));
   }
 }
 void display_PID(MotorController motor_controllers[2],bool PID_CONTROLL_DISPLAY) // motor_controllers[0] MOTOR_LEFT motor_controllers[1] MOTOR_RIGHT
@@ -338,44 +349,58 @@ void display_PID(MotorController motor_controllers[2],bool PID_CONTROLL_DISPLAY)
 
   if (PID_CONTROLL_DISPLAY == true)
   {
-    Serial.println("DISPLAY PID PRAMETER");
+    Serial.println(F("DISPLAY PID PRAMETER"));
 
-    Serial.print("Encoder count (L/R): " + String(motor_controllers[0].getCount()) + ",");
-    //Serial.print(String(motor_controllers[0].getCount()));
-    //Serial.print(",");
+    Serial.print(F("Encoder count (L/R): "));
+    Serial.print(String(motor_controllers[0].getCount()));
+    Serial.print(F(","));
     Serial.println(String(motor_controllers[1].getCount()));
 
-    Serial.print("Target RPM (L/R): " + String(motor_controllers[0].getTargetRpm()) + ",");
-    //Serial.print(String(motor_controllers[0].getTargetRpm()));
-    //Serial.print(",");
+    Serial.print(F("Target RPM (L/R): "));
+    Serial.print(String(motor_controllers[0].getTargetRpm()));
+    Serial.print(F(","));
     Serial.println(String(motor_controllers[1].getTargetRpm()));
 
-    Serial.print("PID CONTROL RPM(L/R):" + String(motor_controllers[0].getRpm()) + ",");
-    //Serial.print(motor_controllers[0].getRpm()); // 制御量を見るため。デバッグ用
-    //Serial.print(motor_controllers[0].getSpeed()); // 制御量を見るため。デバッグ用
-    //Serial.print(",");
+    Serial.print(F("PID CONTROL RPM(L/R):")); 
+    Serial.print(String(motor_controllers[0].getRpm()));
+    Serial.print(F(","));
     Serial.println(motor_controllers[1].getRpm());    //制御量を見るため。デバッグ用
-    //Serial.println(motor_controllers[1].getSpeed());    //制御量を見るため。デバッグ用
 
-    Serial.println("PID controll gain = P x kp + I x ki + D x kd");
-
-
-    Serial.print("[L]: " + String(motor_controllers[0].getSpeed()) + " = ");
-    Serial.print(String(motor_controllers[0].getPID_P()) + " x " + String(L_KP) + " + ");
-    Serial.print(String(motor_controllers[0].getPID_I()) + " x " + String(L_KI) + " + ");
-    Serial.println(String(motor_controllers[0].getPID_D()) + " x " + String(L_KD) + " + ");
-    Serial.print("[R]: " + String(motor_controllers[1].getSpeed()) + " = ");
-    Serial.print(String(motor_controllers[1].getPID_P()) + " x " + String(R_KP) + " + ");
-    Serial.print(String(motor_controllers[1].getPID_I()) + " x " + String(R_KI) + " + ");
-    Serial.println(String(motor_controllers[1].getPID_D()) + " x " + String(R_KD) + " + ");
-
-    Serial.println("");
+    Serial.println(F("PID controll gain = P x kp + I x ki + D x kd"));
+    Serial.print(F("[L]: ")); 
+    Serial.print(String(motor_controllers[0].getSpeed())); 
+    Serial.print(F(" = "));
+    Serial.print(String(motor_controllers[0].getPID_P())); 
+    Serial.print(F(" x "));
+    Serial.print(String(L_KP));
+    Serial.print(F(" + "));
+    Serial.print(String(motor_controllers[0].getPID_I())); 
+    Serial.print(F(" x "));
+    Serial.print(String(L_KI)); 
+    Serial.print(F(" + "));
+    Serial.print(String(motor_controllers[0].getPID_D())); 
+    Serial.print(F(" x ")); 
+    Serial.println(String(L_KD)); 
+    Serial.print(F("[R]: ")); 
+    Serial.print(String(motor_controllers[1].getSpeed())); 
+    Serial.print(F(" = "));
+    Serial.print(String(motor_controllers[1].getPID_P()));
+    Serial.print(F(" x "));
+    Serial.print(String(R_KP)); 
+    Serial.print(F(" + "));
+    Serial.print(String(motor_controllers[1].getPID_I()));
+    Serial.print(F(" x ")); 
+    Serial.print(String(R_KI));
+    Serial.print(F(" + "));
+    Serial.print(String(motor_controllers[1].getPID_D()));
+    Serial.print(F(" x ")); 
+    Serial.println(String(R_KD));
   }
 }
 
 int split(String data, char delimiter, String *dst)//dstは参照引き渡し
 {
-  Serial.println("split");// デバッグ用確認    
+  Serial.println(F("split"));// デバッグ用確認    
   int index = 0;
   int arraySize = (sizeof(data) / sizeof((data)[0]));
   int datalength = data.length();
@@ -394,14 +419,12 @@ int split(String data, char delimiter, String *dst)//dstは参照引き渡し
 
 void motor_direct_instructions(int left, int right,MotorController motor_controllers[2])// motor_controllers[0] MOTOR_LEFT motor_controllers[1] MOTOR_RIGHT
 {
-  //Serial.print(" motor_direct_instructions:: ");// デバッグ用確認    
   motor_controllers[0].servo_.writeMicroseconds(left);
   motor_controllers[1].servo_.writeMicroseconds(right);
-  //Serial.println("l: " + String(left) + ",r " + String(right));
 }
 void rc_mode(volatile unsigned long rcTime[PWM_IN_MAX],MotorController motor_controllers[2])
 {
-  //Serial.print("rc_mode::");// デバッグ用確認    
+  //Serial.print(F("rc_mode::")));// デバッグ用確認    
 
   digitalWrite(LED_BUILTIN, LOW); // RC_MODEでLED消灯
   // 値をそのままへESCへ出力する
@@ -443,14 +466,17 @@ void go_backward(float distance,float max_velocity)
     if (init_current_cmd >= CMD_SIZE - 1)
     {
       //Serial.println("init_current_cmd: " + String(init_current_cmd));
-      Serial.println("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。");
+      Serial.println(F("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。"));
       while (1);
     }
 
     // 初回起動時の処理
     //Serial.println("init_current_cmd: " + String(init_current_cmd));
     calc_necessary_count(distance);
-    Serial.println("target_count_L/R: " + String(-target_count_L) + ", " + String(-target_count_R));
+    Serial.print(F("target_count_L/R: ")); 
+    Serial.print(String(-target_count_L)); 
+    Serial.print(F(", "));
+    Serial.println(String(-target_count_R));
     float velocity = 0.0;
     if(max_velocity == EXCEPTION_NO)
     {
@@ -486,7 +512,7 @@ void turn_clockwise(float degree,float max_velocity)
     if (init_current_cmd >= CMD_SIZE - 1)
     {
       //Serial.println("init_current_cmd: " + String(init_current_cmd));
-      Serial.println("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。");
+      Serial.println(F("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。"));
       while (1);
     }
 
@@ -563,7 +589,7 @@ void go_forward(float distance,float max_velocity)
     }
     // テスト(L/R +4000カウント必要と固定して全体の動作テスト。実際は↑の関数で計算した必要カウント数を使う）
     set_arduino_cmd_matrix(target_count_L, target_count_R, EXCEPTION_NO, EXCEPTION_NO, velocity, velocity); // ここではテストで4000カウントまで、L/Rともに50rpmで進む。
-    //Serial.println("matrix_target_count_L/R: " + String(arduino_cmd_matrix[init_current_cmd][0]) + ", " + String(arduino_cmd_matrix[init_current_cmd][0]));    
+    //Serial.println("matrix_target_count_L/R: " + String(arduino_count_cmd_matrix[init_current_cmd][0]) + ", " + String(arduino_count_cmd_matrix[init_current_cmd][0]));    
     init_current_cmd++;
 
   }
@@ -590,14 +616,17 @@ void turn_counter_clockwise(float degree,float max_velocity)
     if (init_current_cmd >= CMD_SIZE - 1)
     {
       //Serial.println("init_current_cmd: " + String(init_current_cmd));
-      Serial.println("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。");
+      Serial.println(F("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。"));
       while (1);
     }
 
     // 初回起動時の処理
     //Serial.println("init_current_cmd: " + String(init_current_cmd));
     calc_necessary_rotate(degree);
-    Serial.println("target_count_L/R: " + String(-target_count_L) + ", " + String(-target_count_R));
+    Serial.print(F("target_count_L/R: "));
+    Serial.print(String(-target_count_L)); 
+    Serial.print(F(", ")); 
+    Serial.println(String(-target_count_R));
 
     float velocity = 0.0;
     if(max_velocity == EXCEPTION_NO)
@@ -653,7 +682,7 @@ void hidarimawari180(float max_velocity)
 
 void reset_arduino_mode_flags()
 {
-  Serial.println("reset_arduino_mode_flags");// デバッグ用確認
+  Serial.println(F("reset_arduino_mode_flags"));// デバッグ用確認
   cmd_init = false;
   current_cmd = 0;
   target_count_L = 0;
@@ -672,17 +701,17 @@ void reset_arduino_mode_flags()
 
 void set_go_forward_cmd(MotorController motor_controllers[2])
 {
-  target_count_L = motor_controllers[0].getCount() + arduino_cmd_matrix[current_cmd][0];
-  //Serial.println("target_count_L: " + String(target_count_L) + " = " + String(motor_controllers[MOTOR_LEFT].getCount()) + " + " + String(arduino_cmd_matrix[current_cmd][0]));
+  target_count_L = motor_controllers[0].getCount() + arduino_count_cmd_matrix[current_cmd][0];
+  //Serial.println("target_count_L: " + String(target_count_L) + " = " + String(motor_controllers[MOTOR_LEFT].getCount()) + " + " + String(arduino_count_cmd_matrix[current_cmd][0]));
   //while(1);
-  if (arduino_cmd_matrix[current_cmd][0] >= 0) {
+  if (arduino_count_cmd_matrix[current_cmd][0] >= 0) {
     cmd_L_back = false;
   } else {
     cmd_L_back = true;
   }
 
-  target_count_R = motor_controllers[1].getCount() + arduino_cmd_matrix[current_cmd][1];
-  if (arduino_cmd_matrix[current_cmd][1] >= 0) {
+  target_count_R = motor_controllers[1].getCount() + arduino_count_cmd_matrix[current_cmd][1];
+  if (arduino_count_cmd_matrix[current_cmd][1] >= 0) {
     cmd_R_back = false;
   } else {
     cmd_R_back = true;
@@ -691,26 +720,38 @@ void set_go_forward_cmd(MotorController motor_controllers[2])
 
 void view_flags()
 {
-  //Serial.println("");
-  //Serial.println("FLAGS");
-  //Serial.println("cmd_init: " + String(cmd_init));
-  //Serial.println("current_cmd: " + String(current_cmd));
-  //Serial.println("target_count_L: " + String(target_count_L));
-  //Serial.println("target_count_R: " + String(target_count_R));
-  //Serial.println("cmd_exec: " + String(cmd_exec));
-  //Serial.println("count_done: " + String(count_done));
-  //Serial.println("wait_done: " + String(wait_done));
-  //Serial.println("button_done: " + String(button_done));
-  //Serial.println("spi_done: " + String(spi_done));
-  //Serial.println("target_wait_time: " + String(target_wait_time));
-  //Serial.println("button_push_count: " + String(button_push_count));
-  //Serial.println("button_enable: " + String(button_enable));
-  //Serial.println("");
+  Serial.println(F(""));
+  Serial.println(F("FLAGS"));
+  Serial.print(F("cmd_init: "));
+  Serial.println(String(cmd_init));
+  Serial.print(F("current_cmd: "));
+  Serial.println(String(current_cmd));
+  Serial.print(F("target_count_L: "));
+  Serial.println(String(target_count_L));
+  Serial.print(F("target_count_R: "));
+  Serial.println(String(target_count_R));
+  Serial.print(F("cmd_exec: "));
+  Serial.println(String(cmd_exec));
+  Serial.print(F("count_done: "));
+  Serial.println(String(count_done));
+  Serial.print(F("wait_done: "));
+  Serial.println(String(wait_done));
+  Serial.print(F("button_done: "));
+  Serial.println(String(button_done));
+  Serial.print(F("spi_done: "));
+  Serial.println(String(spi_done));
+  Serial.print(F("target_wait_time: "));
+  Serial.println(String(target_wait_time));
+  Serial.print(F("button_push_count: "));
+  Serial.println(String(button_push_count));
+  Serial.print(F("button_enable: "));
+  Serial.println(String(button_enable));
+  Serial.println(F(""));
 }
 
 void check_achievement_spi_cmd()
 {
-  send_spi(arduino_cmd_matrix[current_cmd][3]);
+  send_spi(arduino_flag_cmd_matrix[current_cmd][1]);
   spi_done = true;
 }
 
@@ -725,7 +766,7 @@ void cmd_end(MotorController motor_controllers[2])  // もっとマシな名前�
     if (init_current_cmd >= CMD_SIZE)
     {
       //Serial.println("init_current_cmd: " + String(init_current_cmd));
-      Serial.println("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。"); // ココには至らないはず
+      Serial.println(F("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。")); // ココには至らないはず
       while (1);
     }
 
@@ -753,7 +794,7 @@ void check_achievement_wait_time_cmd(MotorController motor_controllers[2])
 
 void cmd_manager_flags_init(MotorController motor_controllers[2])
 {
-  //Serial.println("#     CMD_manager_init     #");
+  //Serial.println(F("#     CMD_manager_init     #"));
   // これからコマンドを実行するときの処理
   reset_pid_gain(motor_controllers);
   cmd_exec = true;
@@ -768,35 +809,35 @@ void cmd_manager_flags_init(MotorController motor_controllers[2])
   if (init_current_cmd >= CMD_SIZE - 1)
   {
     //end_arduino_mode = true;  // 途中までコマンドを実行する場合はRCMODEに戻す。だが、強制終了することにした。
-    Serial.println("init_current_cmd: " + String(init_current_cmd));
-    Serial.println("コマンドの上限数以上にコマンドを設定しています。強制終了。");
+    Serial.print(F("init_current_cmd: ")); 
+    Serial.println(String(init_current_cmd));
+    Serial.println(F("コマンドの上限数以上にコマンドを設定しています。強制終了。"));
     while (1);
   }
 
 
   // 実行しないコマンドのフラグを処理（カウントのコマンド→時間やボタンはやらない）
-  if (arduino_cmd_matrix[current_cmd][0] == EXCEPTION_NO && arduino_cmd_matrix[current_cmd][1] == EXCEPTION_NO)
+  if (arduino_count_cmd_matrix[current_cmd][0] == EXCEPTION_NO && arduino_count_cmd_matrix[current_cmd][1] == EXCEPTION_NO)
     count_done = true;
 
-  if (arduino_cmd_matrix[current_cmd][2] == EXCEPTION_NO)
+  if (arduino_flag_cmd_matrix[current_cmd][0] == EXCEPTION_NO)
     wait_done = true;
 
-  if (arduino_cmd_matrix[current_cmd][3] != 255)
+  if (arduino_flag_cmd_matrix[current_cmd][1] != 255)
     button_done = true;
 
-  //Serial.println(arduino_cmd_matrix[current_cmd][3]);
-  if (arduino_cmd_matrix[current_cmd][3] < 1 || 7 < arduino_cmd_matrix[current_cmd][3])
+  if (arduino_flag_cmd_matrix[current_cmd][1] < 1 || 7 < arduino_flag_cmd_matrix[current_cmd][1])
     spi_done = true;
 
-  Serial.println("Current cmd: " + String(current_cmd));
+  Serial.print(F("Current cmd: "));
+  Serial.println(String(current_cmd));
   view_flags();
-  Serial.println("");
-
+  Serial.println(F(""));
 
   // ここに入ったら終了。
   if (count_done == true && wait_done == true && button_done == true && spi_done == true)
   {
-    Serial.println("すべてのコマンド実行完了。または、初期化のままでコマンド入力できていない。");
+    Serial.println(F("すべてのコマンド実行完了。または、初期化のままでコマンド入力できていない。"));
     view_flags();
     end_arduino_mode = true;
   }
@@ -805,10 +846,10 @@ void cmd_manager_flags_init(MotorController motor_controllers[2])
       count_done == false && wait_done == false || wait_done == false && button_done == false || \
       wait_done == false && spi_done == false || button_done == false && spi_done == false)
   {
-    Serial.println("## BAD CASE!! ##");
+    Serial.println(F("## BAD CASE!! ##"));
     view_flags();
     view_arduino_cmd_matrix();
-    Serial.println("複数コマンド入力。入力関数に不備があるか、コマンドを上書きしている可能性あり。");
+    Serial.println(F("複数コマンド入力。入力関数に不備があるか、コマンドを上書きしている可能性あり。"));
     stop_motor_immediately(motor_controllers);
     //delay(500);
 

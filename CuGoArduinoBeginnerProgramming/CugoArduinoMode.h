@@ -82,7 +82,7 @@
 //各種閾値
 #define ARDUINO_MODE_IN   1700  // ARDUINOモードに入るときの閾値(us) (1100~1900/中央1500)
 #define ARDUINO_MODE_OUT  1300  // ARDUINOモードから抜けるときの閾値(us) (1100~1900/中央1500)
-#define CMD_SIZE 20 //　コマンド数上限
+#define CMD_SIZE 61 //　コマンド数上限
 #define EXCEPTION_NO -32768 //int下限？
 
 //モーター設定
@@ -105,7 +105,8 @@
 
 
 // グローバル変数宣言
-extern long int arduino_cmd_matrix[CMD_SIZE][6];
+extern long int arduino_count_cmd_matrix[CMD_SIZE][2];
+extern int arduino_flag_cmd_matrix[CMD_SIZE][4];
 extern int init_current_cmd;
 
 extern long int target_count_L;
@@ -123,7 +124,10 @@ extern bool wait_done;
 extern bool button_done;
 extern bool spi_done;
 extern bool end_arduino_mode;
-
+extern unsigned long long current_time;
+extern unsigned long long prev_time_10ms; 
+extern unsigned long long prev_time_100ms; 
+extern unsigned long long prev_time_1000ms; 
 
 //各種関数
   void init_SPI();
