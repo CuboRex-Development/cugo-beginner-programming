@@ -21,9 +21,9 @@
 #define PIN_ENCODER_R_B 9  // エンコーダ回転方向入力ピン(R)
 
 // プロポ信号の読み取りピン（L/R/MODE_CAHNGE）
-#define PWM_IN_PIN0   5   // プロポスティック入力ピン(L)
-#define PWM_IN_PIN1   6   // プロポスティック入力ピン(MODE)
-#define PWM_IN_PIN2   7   // プロポスティック入力ピン(R)
+#define PWM_IN_PIN0   5   // プロポスティック入力ピン(L)//digitalRead ピン変化割り込みの設定
+#define PWM_IN_PIN1   6   // プロポスティック入力ピン(MODE)//digitalRead ピン変化割り込みの設定
+#define PWM_IN_PIN2   7   // プロポスティック入力ピン(R)//digitalRead ピン変化割り込みの設定
 
 //cugo仕様関連
 #define wheel_radius_l  0.03858f
@@ -82,7 +82,7 @@
 //各種閾値
 #define ARDUINO_MODE_IN   1700  // ARDUINOモードに入るときの閾値(us) (1100~1900/中央1500)
 #define ARDUINO_MODE_OUT  1300  // ARDUINOモードから抜けるときの閾値(us) (1100~1900/中央1500)
-#define CMD_SIZE 61 //　コマンド数上限
+#define CMD_SIZE 60 //　コマンド数上限
 #define EXCEPTION_NO -32768 //int下限？
 
 //モーター設定

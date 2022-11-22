@@ -1,3 +1,18 @@
+/*
+ * Copyright [2022] [CuboRex.Inc]
+ * Licensed under the Apache License, Version 2.0 (the “License”);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an “AS IS” BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 #include <Arduino.h>
 #include "CugoArduinoMode.h"
 #include <Servo.h>
@@ -5,12 +20,11 @@
 #include <SPI.h>
 
 /***** ↓各ユーザーごとに設定してください↓ *****/
-
 // シリアル通信での情報の表示有無
-bool UDP_CONNECTION_DISPLAY = true;
-bool ENCODER_DISPLAY = true;
-bool PID_CONTROLL_DISPLAY = true;
-bool FAIL_SAFE_DISPLAY = true;
+bool UDP_CONNECTION_DISPLAY = false;
+bool ENCODER_DISPLAY = false;
+bool PID_CONTROLL_DISPLAY = false;
+bool FAIL_SAFE_DISPLAY = false;
 
 // 回転方向ソフトウェア切り替え
 const bool L_reverse = false;
@@ -49,11 +63,8 @@ float r_count_prev_p_ = 0;
 float l_count_gain = 0;
 float r_count_gain = 0;
 
-//割込み処理のためCugoArduinoModeへの移動不可
-// ピン変化割り込みの割り込み #TODO まだコードを畳められていない
 ISR(PCINT2_vect)
 {
-  //Serial.println(F("割り込み"));
   if (OLD_PWM_IN_PIN0_VALUE != digitalRead(PWM_IN_PIN0))
   {
     if (LOW == OLD_PWM_IN_PIN0_VALUE)
@@ -68,8 +79,7 @@ ISR(PCINT2_vect)
   }
 
   if (OLD_PWM_IN_PIN1_VALUE != digitalRead(PWM_IN_PIN1))
-  {  //Serial.println(F("モード変更割り込み"));
-
+  {  
     if (LOW == OLD_PWM_IN_PIN1_VALUE)
     { // 立ち上がり時の処理
       PIN_UP(1);
@@ -95,7 +105,6 @@ ISR(PCINT2_vect)
   }
 }
 
-//移動すべきではない　attachInterruptが入っているため
 void init_PID()
 {
   pinMode(PIN_ENCODER_L_A, INPUT_PULLUP);     //A相用信号入力　入力割り込みpinを使用　内蔵プルアップ有効
@@ -117,19 +126,16 @@ void init_PID()
   delay(100); // すぐに別の値でモータを回そうとするとガクガクするので落ち着くまで待つ。10ms程度でも問題なし。
 }
 
-//CugoArduinoModeへの移動不可?githubで確認中
 void leftEncHandler()
 {
   motor_controllers[MOTOR_LEFT].updateEnc();
 }
 
-//CugoArduinoModeへの移動不可?githubで確認中
 void rightEncHandler()
 {
   motor_controllers[MOTOR_RIGHT].updateEnc();
 }
 
-//CMD_EXECUTEがあるため退避不可
 void arduino_mode()
 {
   digitalWrite(LED_BUILTIN, HIGH);  // ARDUINO_MODEでLED点灯
@@ -139,7 +145,6 @@ void arduino_mode()
   }
 }
 
-//割り込み周りが入っているため退避すべきではない
 void check_mode_change()
 {
   noInterrupts();      //割り込み停止
@@ -154,7 +159,9 @@ void check_mode_change()
   {
     if (runMode != ARDUINO_MODE)
     { // モードが変わった時(RC→ARDUINO)
-      Serial.println(F("Mode changed::ARDUINO_MODE"));      
+      Serial.println(F("##########################"));                  
+      Serial.println(F("### モード:ARDUINO_MODE ###"));
+      Serial.println(F("##########################"));            
       //motor_direct_instructions(1500, 1500,,motor_controllers); //直接停止命令を出す
       stop_motor_immediately(motor_controllers);
       reset_arduino_mode_flags();
@@ -166,19 +173,17 @@ void check_mode_change()
   {
     if (runMode != RC_MODE)
     { // モードが変わった時(ARDUINO→RC)
-      Serial.println(F("Mode changed::RC_MODE"));      
+      Serial.println(F("##########################"));                  
+      Serial.println(F("###   モード:RC_MODE    ###"));
+      Serial.println(F("##########################"));            
       reset_arduino_mode_flags();
     }
     runMode = RC_MODE;
   }
-
-  // モードごとの処理
-  //Serial.println(F("runMode: ") + String(runMode));
-  //Serial.println(F("hoge"));
+  
   if (ARDUINO_MODE == runMode)
   {
     //Serial.println(F("### ARDUINO MODE ###"));
-
     arduino_mode();
   }
   else
@@ -188,42 +193,35 @@ void check_mode_change()
   }
 }
 
-//可用性を考えるとjobは退避すべきではない？
 void job_10ms()
 {
   check_mode_change();
 }
 
-//可用性を考えるとjobは退避すべきではない？//★利用するとグローバル変数圧迫される
 void job_100ms()
 {
-  //check_failsafe();存在しない関数
   display_speed(motor_controllers,ENCODER_DISPLAY);
   display_target_rpm(motor_controllers,ENCODER_DISPLAY);
   display_PID(motor_controllers,PID_CONTROLL_DISPLAY);
   display_failsafe(FAIL_SAFE_DISPLAY,runMode);
 }
-//可用性を考えるとjobは退避すべきではない？//★利用するとグローバル変数圧迫される
 void job_1000ms()
 {
   //display_nothing(UDP_CONNECTION_DISPLAY,ENCODER_DISPLAY,PID_CONTROLL_DISPLAY);
 }
 
-
 void check_achievement_go_forward_cmd()
 {
-  bool L_done = false;//故障のため・・10/24 
+  bool L_done = false;
   bool R_done = false;
 
-  // L側目標達成チェック// 位置制御とバッティングする　
+  // L側目標達成チェック
   if (cmd_L_back == false) {
-    //if (target_count_L < motor_controllers[MOTOR_LEFT].getCount())//退避用
     if (target_count_L < motor_controllers[MOTOR_LEFT].getCount())
       L_done = true;
     //Serial.println(F("L_DONE!"));
     //motor_controllers[MOTOR_LEFT].setTargetRpm(0);
   } else {
-    //if (target_count_L > motor_controllers[MOTOR_LEFT].getCount())//退避用
     if (target_count_L > motor_controllers[MOTOR_LEFT].getCount())
       L_done = true;
     //Serial.println(F("L_DONE!"));
@@ -232,13 +230,11 @@ void check_achievement_go_forward_cmd()
 
   // R側目標達成チェック
   if (cmd_R_back == false) {
-    //if (target_count_R < motor_controllers[MOTOR_RIGHT].getCount())//退避用
     if (target_count_R < motor_controllers[MOTOR_RIGHT].getCount())
       R_done = true;
     //Serial.println(F("R_DONE!"));
     //motor_controllers[MOTOR_RIGHT].setTargetRpm(0);
   } else {
-    //if (target_count_R > motor_controllers[MOTOR_RIGHT].getCount())//退避用
     if (target_count_R > motor_controllers[MOTOR_RIGHT].getCount())
       R_done = true;
     //Serial.println(F("R_DONE!"));
@@ -248,12 +244,12 @@ void check_achievement_go_forward_cmd()
   if (L_done == true)
   {
     motor_controllers[MOTOR_LEFT].setTargetRpm(0);
-    Serial.println(F("L_DONE!"));
+    //Serial.println(F("L_DONE!"));
   }
   if (R_done == true)
   {
     motor_controllers[MOTOR_RIGHT].setTargetRpm(0);
-    Serial.println(F("R_DONE!"));
+    //Serial.println(F("R_DONE!"));
   }
 
   // L/R達成していたら終了
@@ -263,14 +259,16 @@ void check_achievement_go_forward_cmd()
     count_done = true;
   }
 }
-//
 void cmd_manager()
 {
   if (cmd_init == false)
   {
     // 初回起動時の処理
-    //Serial.println(F("cmd_init"));
-
+  //if (init_current_cmd == 0)
+  //{
+    Serial.println(F("##########################"));
+    Serial.println(F("###   コマンド準備開始    ###"));
+  //}  
   }
   else
   {
@@ -303,11 +301,9 @@ void cmd_manager()
       {
         // SPIに関しては、終了目標値がないため何もしない。
       }
-
-      //Serial.println(F("Start command: ") + String(current_cmd));
+      //Serial.println(F("### Command Start ###"));
       //view_flags();
       //Serial.println(F(""));
-
     }
 
     // コマンド実行中処理
@@ -368,10 +364,10 @@ void cmd_manager()
         //位置制御
         motor_controllers[MOTOR_LEFT].setTargetRpm(l_count_gain);
         motor_controllers[MOTOR_RIGHT].setTargetRpm(r_count_gain);
-        Serial.print(F("gain:l/r "));
-        Serial.print(String(l_count_gain));
-        Serial.print(F(","));
-        Serial.println(String(r_count_gain));
+        //Serial.print(F("gain:l/r "));
+        //Serial.print(String(l_count_gain));
+        //Serial.print(F(","));
+        //Serial.println(String(r_count_gain));
         /*
        //使うもの
        arduino_count_cmd_matrix[current_cmd][0] //L側の目標カウント数
@@ -416,9 +412,14 @@ void cmd_manager()
 
         if (end_arduino_mode == true)
         {
+          Serial.println(F("###   コマンド実行終了    ###"));
+          Serial.println(F("##########################"));          
           reset_arduino_mode_flags();
           end_arduino_mode = false;
           runMode = RC_MODE;
+          Serial.println(F("##########################"));                  
+          Serial.println(F("###   モード:RC_MODE    ###"));
+          Serial.println(F("##########################"));            
         }
       }
     }
@@ -444,6 +445,9 @@ void check_achievement_button_cmd()
 void setup()
 {
   Serial.begin(115200);
+  Serial.println(F("##########################"));  
+  Serial.println(F("###    Arduino 起動     ###"));
+  Serial.println(F("##########################"));
   init_PID();
   init_KOPROPO(runMode,OLD_PWM_IN_PIN0_VALUE,OLD_PWM_IN_PIN1_VALUE,OLD_PWM_IN_PIN2_VALUE);
   //init_UDP();//存在しない関数
@@ -492,10 +496,11 @@ void loop()
 
 /* 使えるコマンドリスト */
 /*
- * susumu(1.0);　入力した数字m 分だけ前に進む（テスト時は3m以下にしてください。止まりません）
- * //追加コマンド：susumu(1.0,90);速度上限rpmで設定　0~180 距離が短いと上限に行かない場合もある
- * sagaru(1.0);　入力した数字m 分だけ前に進む（テスト時は3m以下にしてください。止まりません）
+ * susumu(1.0);　入力した()内の数字m 分だけ前に進む
+ * //追加コマンド：susumu(1.0,90);速度上限90rpmで設定　距離が短いと上限速度に達さない場合もある
+ * sagaru(1.0);　入力した()内の数字m 分だけ前に進む
  * migimawari45(); 45度右に回転する
+ * //追加コマンド：migimawari45(90);入力した()内の速度上限で設定　最大180
  * migimawari90(); 90度右に回転する
  * migimawari180(); 180度右に回転する
  * hidarimawari45(); 45度右に回転する
@@ -509,17 +514,15 @@ void loop()
 
 void CMD_EXECUTE()
 {
-  //Serial.println(F("CMD_EXECUTE"));// デバッグ用確認
-  //Serial.println(F("Current command: ") + String(current_cmd));
   cmd_manager();  // おまじない
 
   // ここから↓を改造していこう！
 
   button();
 
-  susumu(5.0);
+  susumu(1.0);
   matsu(1000); 
-  susumu(4.0,150);
+  susumu(1.0,150);
   matsu(1000);
   migimawari90();
   matsu(1000);
@@ -529,7 +532,7 @@ void CMD_EXECUTE()
   matsu(1000);
   migimawari(30,60);
   matsu(1000);
-  sagaru(2.0);
+  sagaru(1.0);
   matsu(1000);
   hidarimawari90(10);
   matsu(1000);
