@@ -128,6 +128,9 @@ extern unsigned long long current_time;
 extern unsigned long long prev_time_10ms; 
 extern unsigned long long prev_time_100ms; 
 extern unsigned long long prev_time_1000ms; 
+//RUN_MODE runMode = RC_MODE;  // 初回起動時はRC_MODE（無意識な暴走を防ぐため）
+extern int runMode;
+
 
 //各種関数
   void init_SPI();

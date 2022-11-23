@@ -51,8 +51,6 @@ volatile unsigned long time[PWM_IN_MAX];
 int OLD_PWM_IN_PIN0_VALUE;   // プロポスティック入力値(L)
 int OLD_PWM_IN_PIN1_VALUE;   // プロポスティック入力値(MODE)
 int OLD_PWM_IN_PIN2_VALUE;   // プロポスティック入力値(R)
-//RUN_MODE runMode = RC_MODE;  // 初回起動時はRC_MODE（無意識な暴走を防ぐため）
-int runMode = ARDUINO_MODE;
 
 
 //// PID位置制御のデータ格納
@@ -257,6 +255,12 @@ void check_achievement_go_forward_cmd()
   {
     stop_motor_immediately(motor_controllers);
     count_done = true;
+    Serial.print(F("###"));
+    if(current_cmd < 9)
+        Serial.print(F("0"));
+
+    Serial.print(String(current_cmd+1));
+    Serial.println(F("番目のコマンド：終了  ###"));    
   }
 }
 void cmd_manager()
@@ -268,6 +272,7 @@ void cmd_manager()
   //{
     Serial.println(F("##########################"));
     Serial.println(F("###   コマンド準備開始    ###"));
+    
   //}  
   }
   else
@@ -439,6 +444,12 @@ void check_achievement_button_cmd()
   {
     stop_motor_immediately(motor_controllers);
     button_done = true;
+    Serial.print(F("###"));
+    if(current_cmd < 9)
+        Serial.print(F("0"));
+
+    Serial.print(String(current_cmd+1));
+    Serial.println(F("番目のコマンド：終了  ###"));    
   }
 }
 //
@@ -446,7 +457,7 @@ void setup()
 {
   Serial.begin(115200);
   Serial.println(F("##########################"));  
-  Serial.println(F("###    Arduino 起動     ###"));
+  Serial.println(F("### CugoAruduinoKit起動 ###"));
   Serial.println(F("##########################"));
   init_PID();
   init_KOPROPO(runMode,OLD_PWM_IN_PIN0_VALUE,OLD_PWM_IN_PIN1_VALUE,OLD_PWM_IN_PIN2_VALUE);
@@ -528,14 +539,14 @@ void CMD_EXECUTE()
   matsu(1000);
   migimawari90(180);
   matsu(1000);
-  sagaru(1.0,30);
-  matsu(1000);
-  migimawari(30,60);
-  matsu(1000);
-  sagaru(1.0);
-  matsu(1000);
-  hidarimawari90(10);
-  matsu(1000);
+// sagaru(1.0,30);
+//  matsu(1000);
+//  migimawari(30,60);
+//  matsu(1000);
+//  sagaru(1.0);
+//  matsu(1000);
+//  hidarimawari90(10);
+//  matsu(1000);
   //hidarimawari90();
   //matsu(1000);
 
