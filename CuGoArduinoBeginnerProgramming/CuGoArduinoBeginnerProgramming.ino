@@ -456,6 +456,25 @@ void check_achievement_button_cmd()
 void setup()
 {
   Serial.begin(115200);
+
+  Serial.println(F(""));
+  Serial.println(F(""));  
+  Serial.println(F("#######################################"));
+  Serial.println(F("#######################################"));
+  Serial.println(F("#                                     #"));
+  Serial.println(F("#   ####    ##  ##    ####     ####   #"));
+  Serial.println(F("#  ##  ##   ##  ##   ##  ##   ##  ##  #"));
+  Serial.println(F("#  ##       ##  ##   ##       ##  ##  #"));
+  Serial.println(F("#  ##       ##  ##   ## ###   ##  ##  #"));
+  Serial.println(F("#  ##       ##  ##   ##  ##   ##  ##  #"));
+  Serial.println(F("#  ##  ##   ##  ##   ##  ##   ##  ##  #"));
+  Serial.println(F("#   ####     ####     ####     ####   #"));
+  Serial.println(F("#                                     #"));
+  Serial.println(F("#######################################"));
+  Serial.println(F("#######################################"));
+  Serial.println(F(""));
+  Serial.println(F(""));  
+
   Serial.println(F("##########################"));  
   Serial.println(F("### CugoAruduinoKit起動 ###"));
   Serial.println(F("##########################"));
