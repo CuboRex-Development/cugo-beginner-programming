@@ -569,11 +569,6 @@ void CMD_EXECUTE()
   //hidarimawari90();
   //matsu(1000);
 
-
-  //susumu(1.0);
-  //matsu(1000);
-  //migimawari90();
-  //matsu(1000);
   // ここから↑を改造していこう！
 
   cmd_end(motor_controllers);      // おまじない
