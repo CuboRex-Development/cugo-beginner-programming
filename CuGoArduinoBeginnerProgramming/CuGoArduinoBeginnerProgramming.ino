@@ -516,6 +516,7 @@ void setup()
 
 void loop()
 {
+  
   current_time = micros();  // オーバーフローまで約40分
 
   if (current_time - prev_time_10ms > 10000) // TODO 10秒で1msくらいズレる
