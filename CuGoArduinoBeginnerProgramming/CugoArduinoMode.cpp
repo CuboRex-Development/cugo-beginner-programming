@@ -66,12 +66,12 @@ void set_arduino_cmd_matrix(long int cmd_0,long int cmd_1,int cmd_2,int cmd_3,in
 {
   //Serial.println("set_arduino_cmd_matrix()");// デバッグ用確認
   
-  arduino_count_cmd_matrix[init_current_cmd][0] = cmd_0;
-  arduino_count_cmd_matrix[init_current_cmd][1] = cmd_1;
-  arduino_flag_cmd_matrix[init_current_cmd][0] = cmd_2;
-  arduino_flag_cmd_matrix[init_current_cmd][1] = cmd_3;
-  arduino_flag_cmd_matrix[init_current_cmd][2] = cmd_4;
-  arduino_flag_cmd_matrix[init_current_cmd][3] = cmd_5;
+  arduino_count_cmd_matrix[init_current_cmd][0] = cmd_0;//L側目標カウント数
+  arduino_count_cmd_matrix[init_current_cmd][1] = cmd_1;//R側目標カウント数
+  arduino_flag_cmd_matrix[init_current_cmd][0] = cmd_2;//milisecがEXCEPTION_NO以外なら待ち
+  arduino_flag_cmd_matrix[init_current_cmd][1] = cmd_3;//255ならボタンまち
+  arduino_flag_cmd_matrix[init_current_cmd][2] = cmd_4;//L側上限速度
+  arduino_flag_cmd_matrix[init_current_cmd][3] = cmd_5;//R側上限速度
   
 }
 
@@ -201,6 +201,23 @@ void wait_time(int milisec)
 
   }
 }
+void check_achievement_wait_time_cmd(MotorController motor_controllers[2])
+{
+  //Serial.println("curennt time: " + String(micros()) + ", target_time: " + String(target_wait_time));
+  if (target_wait_time < micros())
+  {
+    stop_motor_immediately(motor_controllers);
+    wait_done = true;
+    Serial.print(F("###"));
+    if(current_cmd < 9)
+        Serial.print(F("0"));
+    
+    Serial.print(String(current_cmd+1));
+    Serial.print(F("番目のコマンド：終了  "));  
+    Serial.print(String(arduino_flag_cmd_matrix[current_cmd][0]+(micros()-target_wait_time) / 1000 ));
+    Serial.println(F("ミリ秒　待った  ###"));  
+  }
+}
 
 void matsu(int milisec)
 {
@@ -292,7 +309,7 @@ void wait_button()
 
       Serial.print(String(init_current_cmd+1));
       Serial.print(F("番目のコマンド："));
-      Serial.println(F("ボタンの押し待ち"));
+      Serial.println(F("ボタン　押し待ち"));
     }    
     init_current_cmd++;
 
@@ -867,21 +884,7 @@ void cmd_end(MotorController motor_controllers[2])  // もっとマシな名前�
   }
 }
 
-void check_achievement_wait_time_cmd(MotorController motor_controllers[2])
-{
-  //Serial.println("curennt time: " + String(micros()) + ", target_time: " + String(target_wait_time));
-  if (target_wait_time < micros())
-  {
-    stop_motor_immediately(motor_controllers);
-    wait_done = true;
-    Serial.print(F("###"));
-    if(current_cmd < 9)
-        Serial.print(F("0"));
 
-    Serial.print(String(current_cmd+1));
-    Serial.println(F("番目のコマンド：終了  ###"));    
-  }
-}
 
 void cmd_manager_flags_init(MotorController motor_controllers[2])
 {
@@ -932,12 +935,56 @@ void cmd_manager_flags_init(MotorController motor_controllers[2])
     //view_flags();
     end_arduino_mode = true;
   }else{
+          
           Serial.print(F("###"));
           if(current_cmd < 9)
           Serial.print(F("0"));
-
+          
           Serial.print(String(current_cmd+1));
-          Serial.println(F("番目のコマンド：開始  ###"));
+          Serial.print(F("番目のコマンド：開始  "));
+          float degree = 0 ;
+          float distance = 0 ;
+          if(arduino_flag_cmd_matrix[current_cmd][0] != EXCEPTION_NO)//実際の待ち時間確認
+          {
+          Serial.print(String(arduino_flag_cmd_matrix[current_cmd][0]));
+          Serial.print(F("ミリ秒　待つ"));
+          }else if(arduino_flag_cmd_matrix[current_cmd][1] == 255)//ボタン押し待ち
+          {
+          Serial.print(F("ボタン　押し待ち"));
+          }else if(arduino_flag_cmd_matrix[current_cmd][2] > 0 && arduino_flag_cmd_matrix[current_cmd][3] > 0)//前進
+          {
+          distance =  (arduino_count_cmd_matrix[current_cmd][0]) * (( 2 * wheel_radius_l * PI) / encoder_resolution );
+          Serial.print(String(abs(distance)));        
+          Serial.print(F(" m　前進"));              
+          }else if(arduino_flag_cmd_matrix[current_cmd][2] < 0 && arduino_flag_cmd_matrix[current_cmd][3] > 0)//左回り
+          {
+          degree = (2 * wheel_radius_l * PI * arduino_count_cmd_matrix[current_cmd][0] * 360) / (encoder_resolution * tread * PI);
+          Serial.print(String(abs(degree)));                      
+          Serial.print(F(" 度　左回り"));              
+          }else if(arduino_flag_cmd_matrix[current_cmd][2] > 0 && arduino_flag_cmd_matrix[current_cmd][3] < 0)//右回り
+          {
+          degree = (2 * wheel_radius_l * PI * arduino_count_cmd_matrix[current_cmd][0] * 360) / (encoder_resolution * tread * PI);
+          Serial.print(String(abs(degree)));                      
+          Serial.print(F(" 度　右回り"));
+          }else if(arduino_flag_cmd_matrix[current_cmd][2] < 0 && arduino_flag_cmd_matrix[current_cmd][3] < 0)//後進
+          {
+          distance =  (arduino_count_cmd_matrix[current_cmd][0]) * (( 2 * wheel_radius_l * PI) / encoder_resolution );
+          Serial.print(String(abs(distance)));        
+          Serial.print(F(" m　後進"));                
+          }else{
+          Serial.print(F("不明なコマンド"));  
+          }
+          Serial.println(F("  ###"));
+
+          /*
+
+   
+    arduino_flag_cmd_matrix[init_current_cmd][0] = cmd_2;//milisecがEXCEPTION_NO以外なら待ち
+  arduino_flag_cmd_matrix[init_current_cmd][1] = cmd_3;//255ならボタンまち
+  arduino_flag_cmd_matrix[init_current_cmd][2] = cmd_4;
+  arduino_flag_cmd_matrix[init_current_cmd][3] = cmd_5;
+    Serial.print(String(current_cmd+1));
+    Serial.print(String(current_cmd+1));    */
   }
   // ここに入ったら誤作動
   if (count_done == false && wait_done == false || count_done == false && button_done == false || \

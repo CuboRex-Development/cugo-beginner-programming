@@ -260,7 +260,36 @@ void check_achievement_go_forward_cmd()
         Serial.print(F("0"));
 
     Serial.print(String(current_cmd+1));
-    Serial.println(F("番目のコマンド：終了  ###"));    
+    Serial.print(F("番目のコマンド：終了  "));
+    float degree = 0 ;
+    float distance = 0 ;
+
+    if(arduino_flag_cmd_matrix[current_cmd][2] > 0 && arduino_flag_cmd_matrix[current_cmd][3] > 0)//前進
+    {
+    distance =  (motor_controllers[MOTOR_LEFT].getCount()) * (( 2 * wheel_radius_l * PI) / encoder_resolution);
+    Serial.print(String(abs(distance)));            
+    Serial.print(F(" m　進んだ"));              
+
+    }else if(arduino_flag_cmd_matrix[current_cmd][2] < 0 && arduino_flag_cmd_matrix[current_cmd][3] > 0)//左回り
+    {
+    degree = (2 * wheel_radius_l * PI * motor_controllers[MOTOR_LEFT].getCount() * 360) / (encoder_resolution * tread * PI);
+    Serial.print(String(abs(degree)));            
+    Serial.print(F(" 度　左回りに回転した"));              
+    }else if(arduino_flag_cmd_matrix[current_cmd][2] > 0 && arduino_flag_cmd_matrix[current_cmd][3] < 0)//右回り
+    {
+    degree = (2 * wheel_radius_l * PI * motor_controllers[MOTOR_LEFT].getCount() * 360) / (encoder_resolution * tread * PI);
+    Serial.print(String(abs(degree)));            
+    Serial.print(F(" 度　右回りに回転した"));
+    }else if(arduino_flag_cmd_matrix[current_cmd][2] < 0 && arduino_flag_cmd_matrix[current_cmd][3] < 0)//後進
+    {
+    distance =  (motor_controllers[MOTOR_LEFT].getCount()) * (( 2 * wheel_radius_l * PI) / encoder_resolution);
+    Serial.print(String(abs(distance)));        
+    Serial.print(F(" m　後に進んだ"));
+    }else{
+    Serial.print(F("不明なコマンド"));  
+    }
+    Serial.println(F("  ###"));
+
   }
 }
 void cmd_manager()
@@ -449,7 +478,7 @@ void check_achievement_button_cmd()
         Serial.print(F("0"));
 
     Serial.print(String(current_cmd+1));
-    Serial.println(F("番目のコマンド：終了  ###"));    
+    Serial.println(F("番目のコマンド：終了  ボタン　押された  ###"));    
   }
 }
 //
