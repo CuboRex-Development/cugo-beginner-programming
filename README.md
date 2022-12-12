@@ -80,6 +80,7 @@ CMD_EXECUTE内では以下のコマンドの実行が可能です。<br>
 1. ファイル内のプログラミングの一番下にある下のコードを確認してください。
 - <details>
   <summary>コードを確認する場合はこちらをクリック</summary>
+  
   ```c
   void CMD_EXECUTE()
   {
@@ -136,6 +137,53 @@ CMD_EXECUTE内では以下のコマンドの実行が可能です。<br>
   cmd_manager();  // おまじない
   // ここから↓を改造していこう！
   button();//ボタン押し待ち
+
+  susumu(0.5); // ★デモプログラミングからの変更箇所
+  matsu(1000); 
+  
+  migimawari90();
+  matsu(1000); 
+  
+  susumu(1.0);
+  matsu(1000); 
+  
+  migimawari90();
+  matsu(1000); 
+  
+  susumu(0.5); // ★デモプログラミングからの変更箇所
+  matsu(1000); 
+  
+  migimawari90();
+  matsu(1000);
+  
+  susumu(1.0);
+  matsu(1000); 
+  
+  migimawari90();
+  matsu(1000);  
+
+  // ここから↑を改造していこう！
+  cmd_end(motor_controllers);      // おまじない
+  }
+  ```
+</details>
+
+#### 4-2-2. 速度を変えるには
+- 問題：CugoArduinoKitが速度を変えて進む方法を考えましょう。
+  - ヒント：susumu() の応用コマンドのカッコ()の中は進む距離と上限速度を表しています。
+  - いろいろ試して確認してみましょう正解は詳細例に記載しています。
+
+- <details>
+  <summary>回答はこちらをクリック</summary>
+  susumuコマンドの中を変更して、向かい合う辺は同じ距離を進むように変更しよう<br>
+
+   ```c
+  void CMD_EXECUTE()
+  {
+  cmd_manager();  // おまじない
+  // ここから↓を改造していこう！
+  button();//ボタン押し待ち
+
   susumu(1.5,60); // ★デモプログラミングからの変更箇所
   matsu(1000); 
   
@@ -159,50 +207,7 @@ CMD_EXECUTE内では以下のコマンドの実行が可能です。<br>
   
   migimawari90();
   matsu(1000);  
-  // ここから↑を改造していこう！
-  cmd_end(motor_controllers);      // おまじない
-  }
-  ```
-</details>
-
-#### 4-2-2. 速度を変えるには
-- 問題：CugoArduinoKitが速度を変えて進む方法を考えましょう。
-  - ヒント：susumu() の応用コマンドのカッコ()の中は進む距離と上限速度を表しています。
-  - いろいろ試して確認してみましょう正解は詳細例に記載しています。
-
-- <details>
-  <summary>回答はこちらをクリック</summary>
-  susumuコマンドの中を変更して、向かい合う辺は同じ距離を進むように変更しよう<br>
-
-   ```c
-  void CMD_EXECUTE()
-  {
-  cmd_manager();  // おまじない
-  // ここから↓を改造していこう！
-  button();//ボタン押し待ち
-  susumu(0.5); // ★デモプログラミングからの変更箇所
-  matsu(1000); 
   
-  migimawari90();
-  matsu(1000); 
-  
-  susumu(1.0);
-  matsu(1000); 
-  
-  migimawari90();
-  matsu(1000); 
-  
-  susumu(0.5); // ★デモプログラミングからの変更箇所
-  matsu(1000); 
-  
-  migimawari90();
-  matsu(1000);
-  
-  susumu(1.0);
-  matsu(1000); 
-  
-  migimawari90();
-  matsu(1000);  
   // ここから↑を改造していこう！
   cmd_end(motor_controllers);      // おまじない
   }
