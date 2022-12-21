@@ -9,8 +9,7 @@ CugoArduinoKitの利用開始までの手順を説明します。
 ### 2-1. 事前準備
 クイックスタートの前に以下の手順が完了しているかを確認してください<br>
 - [ ] CugoArduinoKitの組み立て
-  - 組み立てマニュアルはこちら　**★URLをお願いいたします。**
-  https://github.com/CuboRex-Development/cugo-arduino-beginner-programming/tree/main/manuals
+  - 組み立てマニュアルはこちら<br>https://github.com/CuboRex-Development/cugo-arduino-beginner-programming/tree/main/manuals
 - [ ] USBケーブル：Arduinoとパソコンを接続する用
 - [ ] パソコン (WindowsまたはMac)
 ### 2-2. Arduino IDEのインストール
@@ -43,7 +42,6 @@ CugoArduinoKitでは2つのモードが利用できます
 - 右スティックの上下操作が右クローラーの前進後進移動　<br>
 
 になります<br>
-**★ここに画像をお願いいたします。** <br>
 ![radiocontrol](https://user-images.githubusercontent.com/22425319/208835778-1dd170dc-3de1-4dce-b7ee-83f2c1e0838d.png)
 ### 3-2. 自動走行モードの利用
 CuGoArduinoBeginnerProgramming内の一番下にあるCMD_EXECUTEの関数内をプログラミングすることで自動走行が可能です。
@@ -221,4 +219,4 @@ CMD_EXECUTE内では以下のコマンドの実行が可能です。<br>
 
 ## 5. お問い合わせ先
 - 疑問点、不明点がある場合は issue を立ててください。
-  - **★イシューのリンクをお願いいたします。**
+  - https://github.com/CuboRex-Development/cugo-arduino-beginner-programming/issues
