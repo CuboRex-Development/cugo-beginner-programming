@@ -2,13 +2,15 @@
 ## 1. はじめに
 本リポジトリはCugoArduinoKitを利用するためのサンプルコードです。
 CugoArduinoKitを使ってラジコン走行や自動走行を実現できます。</br>
-**★ここに画像をお願いいたします。**
+![arduino_kit](https://user-images.githubusercontent.com/22425319/208833953-755492cb-052f-4d29-8a24-4b87168e3f8e.jpg)
+
 ## 2. 準備
 CugoArduinoKitの利用開始までの手順を説明します。
 ### 2-1. 事前準備
 クイックスタートの前に以下の手順が完了しているかを確認してください<br>
 - [ ] CugoArduinoKitの組み立て
   - 組み立てマニュアルはこちら　**★URLをお願いいたします。**
+  https://github.com/CuboRex-Development/cugo-arduino-beginner-programming/tree/main/manuals
 - [ ] USBケーブル：Arduinoとパソコンを接続する用
 - [ ] パソコン (WindowsまたはMac)
 ### 2-2. Arduino IDEのインストール
@@ -18,7 +20,8 @@ CugoArduinoKitの利用開始までの手順を説明します。
 4. ダウンロードされたらファイルを実行して指示に従いインストール
 ### 2-2. 学習用ソースコードダウンロード
 1. ここをクリックしてダウンロード
-   - **★案内画像をお願いいたします。**
+![download_zip](https://user-images.githubusercontent.com/22425319/208834960-235e190f-5382-4ece-a3cc-58f4546fe24c.png)
+
 2. ダウンロードしたファイルを解凍
 3. CuGoArduinoBeginnerProgramming.inoをダブルクリックし、ArduinoIDEを起動
 ### 2-3. Aruduino UNOへの書き込み
@@ -33,13 +36,15 @@ CugoArduinoKitの利用開始までの手順を説明します。
 CugoArduinoKitでは2つのモードが利用できます
 ### 3-1. ラジコンモードの利用
 ラジコンモードはCuGoArduinoBeginnerProgramming.inoを書き込み後、付属のコントローラの左スティックを左側に倒すことでラジコンモードが開始します。 <br>
-**★ここに画像をお願いいたします。** <br>
+![controller](https://user-images.githubusercontent.com/22425319/208835611-c366764d-4b30-477a-aac8-c848712c4710.png)
+
 ラジコンモードでの操作方法は<br>
 - 左スティックの上下操作が左クローラーの前進後進移動
 - 右スティックの上下操作が右クローラーの前進後進移動　<br>
 
 になります<br>
 **★ここに画像をお願いいたします。** <br>
+![radiocontrol](https://user-images.githubusercontent.com/22425319/208835778-1dd170dc-3de1-4dce-b7ee-83f2c1e0838d.png)
 ### 3-2. 自動走行モードの利用
 CuGoArduinoBeginnerProgramming内の一番下にあるCMD_EXECUTEの関数内をプログラミングすることで自動走行が可能です。
 ### コマンド 一覧
