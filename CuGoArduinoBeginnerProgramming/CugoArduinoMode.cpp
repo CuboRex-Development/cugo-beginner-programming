@@ -60,7 +60,7 @@ volatile unsigned long time[PWM_IN_MAX];
 void init_SPI()
 {
   //Serial.println(F("#   init_SPI"));//確認用
-  
+
   SPI.begin();
   digitalWrite(SS, HIGH);
 }
@@ -72,7 +72,7 @@ void send_spi(int mode) {
   digitalWrite(SS, HIGH);
 }
 
-void init_KOPROPO(int runMode,int OLD_PWM_IN_PIN0_VALUE,int OLD_PWM_IN_PIN1_VALUE,int OLD_PWM_IN_PIN2_VALUE)
+void init_KOPROPO(int runMode, int OLD_PWM_IN_PIN0_VALUE, int OLD_PWM_IN_PIN1_VALUE, int OLD_PWM_IN_PIN2_VALUE)
 {
   //Serial.println(F("#   init_KOPROPO"));//確認用
   // ピン変化割り込みの初期状態保存
@@ -92,16 +92,16 @@ void init_KOPROPO(int runMode,int OLD_PWM_IN_PIN0_VALUE,int OLD_PWM_IN_PIN1_VALU
   delay(100);
 }
 
-void set_arduino_cmd_matrix(long int cmd_0,long int cmd_1,int cmd_2,int cmd_3,int cmd_4,int cmd_5)
+void set_arduino_cmd_matrix(long int cmd_0, long int cmd_1, int cmd_2, int cmd_3, int cmd_4, int cmd_5)
 {
-  //Serial.println(F("#   set_arduino_cmd_matrix"));//確認用  
+  //Serial.println(F("#   set_arduino_cmd_matrix"));//確認用
   arduino_count_cmd_matrix[init_current_cmd][0] = cmd_0;//L側目標カウント数
   arduino_count_cmd_matrix[init_current_cmd][1] = cmd_1;//R側目標カウント数
   arduino_flag_cmd_matrix[init_current_cmd][0] = cmd_2;//milisecがEXCEPTION_NO以外なら待ち
   arduino_flag_cmd_matrix[init_current_cmd][1] = cmd_3;//255ならボタンまち
   arduino_flag_cmd_matrix[init_current_cmd][2] = cmd_4;//L側上限速度
   arduino_flag_cmd_matrix[init_current_cmd][3] = cmd_5;//R側上限速度
-  
+
 }
 
 void init_ARDUINO_CMD()
@@ -132,12 +132,12 @@ void view_arduino_cmd_matrix()
 
 }
 
-void display_failsafe(bool FAIL_SAFE_DISPLAY,int runMode)
+void display_failsafe(bool FAIL_SAFE_DISPLAY, int runMode)
 {
   //Serial.println(F("#   display_failsafe"));//確認用
   if (FAIL_SAFE_DISPLAY == true)
   {
-    Serial.println(F("DISPLAY FAIL SAFE PARAM"));        
+    Serial.println(F("DISPLAY FAIL SAFE PARAM"));
     Serial.print(F("Mode(ARDUINO/RC): "));
     Serial.println(runMode);
     Serial.print(F("UDP recieve fail count: "));
@@ -171,7 +171,7 @@ void spi_cmd(int spi_cmd_value)
 
     }
     // 初回起動時の処理
-    set_arduino_cmd_matrix( EXCEPTION_NO, EXCEPTION_NO, EXCEPTION_NO, spi_cmd_value, 0, 0); 
+    set_arduino_cmd_matrix( EXCEPTION_NO, EXCEPTION_NO, EXCEPTION_NO, spi_cmd_value, 0, 0);
     init_current_cmd++;
 
   }
@@ -200,19 +200,19 @@ void wait_time(int milisec)
     //Serial.println(F("#   wait_time"));//確認用
     if (init_current_cmd >= CMD_SIZE - 1)
     {
-      Serial.print(F("init_current_cmd: ")); 
+      Serial.print(F("init_current_cmd: "));
       Serial.println(String(init_current_cmd));
       Serial.println(F("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。"));
       while (1);
     }
     // 初回起動時の処理
-    set_arduino_cmd_matrix(EXCEPTION_NO,EXCEPTION_NO, milisec, EXCEPTION_NO, 0, 0); 
-    if (ARDUINO_MODE == runMode){
+    set_arduino_cmd_matrix(EXCEPTION_NO, EXCEPTION_NO, milisec, EXCEPTION_NO, 0, 0);
+    if (ARDUINO_MODE == runMode) {
       Serial.print(F("###"));
-      if(init_current_cmd < 9)
+      if (init_current_cmd < 9)
         Serial.print(F("0"));
 
-      Serial.print(String(init_current_cmd+1));
+      Serial.print(String(init_current_cmd + 1));
       Serial.print(F("番目のコマンド："));
       Serial.print(String(milisec));
       Serial.println(F("ms待つ"));
@@ -234,13 +234,13 @@ void check_achievement_wait_time_cmd(MotorController motor_controllers[2])
     stop_motor_immediately(motor_controllers);
     wait_done = true;
     Serial.print(F("###"));
-    if(current_cmd < 9)
-        Serial.print(F("0"));
-    
-    Serial.print(String(current_cmd+1));
-    Serial.print(F("番目のコマンド：終了  "));  
-    Serial.print(String(arduino_flag_cmd_matrix[current_cmd][0]+(micros()-target_wait_time) / 1000 ));
-    Serial.println(F("ミリ秒　待った  ###"));  
+    if (current_cmd < 9)
+      Serial.print(F("0"));
+
+    Serial.print(String(current_cmd + 1));
+    Serial.print(F("番目のコマンド：終了  "));
+    Serial.print(String(arduino_flag_cmd_matrix[current_cmd][0] + (micros() - target_wait_time) / 1000 ));
+    Serial.println(F("ミリ秒　待った  ###"));
   }
 }
 
@@ -254,7 +254,7 @@ void matu(int milisec)
   wait_time(milisec);
 }
 
-void calc_necessary_rotate(float degree) 
+void calc_necessary_rotate(float degree)
 {
   //Serial.println(F("#   calc_necessary_rotate"));//確認用
   target_count_L =  ((degree / 360) * tread * PI) * encoder_resolution / (2 * wheel_radius_l * PI);
@@ -267,7 +267,7 @@ void calc_necessary_rotate(float degree)
 }
 
 
-void calc_necessary_count(float distance) 
+void calc_necessary_count(float distance)
 {
   //Serial.println(F("#   calc_necessary_count"));//確認用
   //  target_count_L = distance * encoder_resolution / (2 * wheel_radius_l * PI);
@@ -317,16 +317,16 @@ void wait_button()
 
     }
     // 初回起動時の処理
-    set_arduino_cmd_matrix(EXCEPTION_NO, EXCEPTION_NO, EXCEPTION_NO, 255, 0, 0); 
-    if (ARDUINO_MODE == runMode){
+    set_arduino_cmd_matrix(EXCEPTION_NO, EXCEPTION_NO, EXCEPTION_NO, 255, 0, 0);
+    if (ARDUINO_MODE == runMode) {
       Serial.print(F("###"));
-      if(init_current_cmd < 9)
+      if (init_current_cmd < 9)
         Serial.print(F("0"));
 
-      Serial.print(String(init_current_cmd+1));
+      Serial.print(String(init_current_cmd + 1));
       Serial.print(F("番目のコマンド："));
       Serial.println(F("ボタン　押し待ち"));
-    }    
+    }
     init_current_cmd++;
 
   }
@@ -345,7 +345,7 @@ void button()
   wait_button();
 }
 
-void display_speed(MotorController motor_controllers[2],bool ENCODER_DISPLAY) // motor_controllers[0] MOTOR_LEFT motor_controllers[1] MOTOR_RIGHT
+void display_speed(MotorController motor_controllers[2], bool ENCODER_DISPLAY) // motor_controllers[0] MOTOR_LEFT motor_controllers[1] MOTOR_RIGHT
 {
 
   if (ENCODER_DISPLAY == true)
@@ -375,19 +375,19 @@ void display_speed(MotorController motor_controllers[2],bool ENCODER_DISPLAY) //
     //Serial.println(""); // 改行
   }
 }
-void display_target_rpm(MotorController motor_controllers[2],bool ENCODER_DISPLAY) // motor_controllers[0] MOTOR_LEFT motor_controllers[1] MOTOR_RIGHT
-{   
+void display_target_rpm(MotorController motor_controllers[2], bool ENCODER_DISPLAY) // motor_controllers[0] MOTOR_LEFT motor_controllers[1] MOTOR_RIGHT
+{
 
   if (ENCODER_DISPLAY == true)
   {
-  //Serial.println(F("#   display_target_rpm"));//確認用
-  Serial.print(F("target_rpm[L]:"));
-  Serial.println(String(motor_controllers[MOTOR_LEFT].getTargetRpm()));
-  Serial.print(F("target_rpm[R]:"));
-  Serial.println(String(motor_controllers[MOTOR_RIGHT].getTargetRpm()));
+    //Serial.println(F("#   display_target_rpm"));//確認用
+    Serial.print(F("target_rpm[L]:"));
+    Serial.println(String(motor_controllers[MOTOR_LEFT].getTargetRpm()));
+    Serial.print(F("target_rpm[R]:"));
+    Serial.println(String(motor_controllers[MOTOR_RIGHT].getTargetRpm()));
   }
 }
-void display_PID(MotorController motor_controllers[2],bool PID_CONTROLL_DISPLAY) // motor_controllers[0] MOTOR_LEFT motor_controllers[1] MOTOR_RIGHT
+void display_PID(MotorController motor_controllers[2], bool PID_CONTROLL_DISPLAY) // motor_controllers[0] MOTOR_LEFT motor_controllers[1] MOTOR_RIGHT
 {
 
 
@@ -404,46 +404,46 @@ void display_PID(MotorController motor_controllers[2],bool PID_CONTROLL_DISPLAY)
     Serial.print(F(","));
     Serial.println(String(motor_controllers[MOTOR_RIGHT].getTargetRpm()));
 
-    Serial.print(F("PID CONTROL RPM(L/R):")); 
+    Serial.print(F("PID CONTROL RPM(L/R):"));
     Serial.print(String(motor_controllers[MOTOR_LEFT].getRpm()));
     Serial.print(F(","));
     Serial.println(motor_controllers[MOTOR_RIGHT].getRpm());    //制御量を見るため。デバッグ用
 
     Serial.println(F("PID controll gain = P x kp + I x ki + D x kd"));
-    Serial.print(F("[L]: ")); 
-    Serial.print(String(motor_controllers[MOTOR_LEFT].getSpeed())); 
+    Serial.print(F("[L]: "));
+    Serial.print(String(motor_controllers[MOTOR_LEFT].getSpeed()));
     Serial.print(F(" = "));
-    Serial.print(String(motor_controllers[MOTOR_LEFT].getPID_P())); 
+    Serial.print(String(motor_controllers[MOTOR_LEFT].getPID_P()));
     Serial.print(F(" x "));
     Serial.print(String(L_KP));
     Serial.print(F(" + "));
-    Serial.print(String(motor_controllers[MOTOR_LEFT].getPID_I())); 
+    Serial.print(String(motor_controllers[MOTOR_LEFT].getPID_I()));
     Serial.print(F(" x "));
-    Serial.print(String(L_KI)); 
+    Serial.print(String(L_KI));
     Serial.print(F(" + "));
-    Serial.print(String(motor_controllers[MOTOR_LEFT].getPID_D())); 
-    Serial.print(F(" x ")); 
-    Serial.println(String(L_KD)); 
-    Serial.print(F("[R]: ")); 
-    Serial.print(String(motor_controllers[MOTOR_RIGHT].getSpeed())); 
+    Serial.print(String(motor_controllers[MOTOR_LEFT].getPID_D()));
+    Serial.print(F(" x "));
+    Serial.println(String(L_KD));
+    Serial.print(F("[R]: "));
+    Serial.print(String(motor_controllers[MOTOR_RIGHT].getSpeed()));
     Serial.print(F(" = "));
     Serial.print(String(motor_controllers[MOTOR_RIGHT].getPID_P()));
     Serial.print(F(" x "));
-    Serial.print(String(R_KP)); 
+    Serial.print(String(R_KP));
     Serial.print(F(" + "));
     Serial.print(String(motor_controllers[MOTOR_RIGHT].getPID_I()));
-    Serial.print(F(" x ")); 
+    Serial.print(F(" x "));
     Serial.print(String(R_KI));
     Serial.print(F(" + "));
     Serial.print(String(motor_controllers[MOTOR_RIGHT].getPID_D()));
-    Serial.print(F(" x ")); 
+    Serial.print(F(" x "));
     Serial.println(String(R_KD));
   }
 }
 
 int split(String data, char delimiter, String *dst)//dstは参照引き渡し
 {
-  //Serial.println("#   split");// デバッグ用確認    
+  //Serial.println("#   split");// デバッグ用確認
   int index = 0;
   int arraySize = (sizeof(data) / sizeof((data)[0]));
   int datalength = data.length();
@@ -460,19 +460,21 @@ int split(String data, char delimiter, String *dst)//dstは参照引き渡し
   return (index + 1);
 }
 
-void motor_direct_instructions(int left, int right,MotorController motor_controllers[2])// motor_controllers[0] MOTOR_LEFT motor_controllers[1] MOTOR_RIGHT
+void motor_direct_instructions(int left, int right, MotorController motor_controllers[2]) // motor_controllers[0] MOTOR_LEFT motor_controllers[1] MOTOR_RIGHT
 {
   //Serial.println(F("#   motor_direct_instructions"));//確認用
   motor_controllers[0].servo_.writeMicroseconds(left);
   motor_controllers[1].servo_.writeMicroseconds(right);
 }
-void rc_mode(volatile unsigned long rcTime[PWM_IN_MAX],MotorController motor_controllers[2])
+void rc_mode(volatile unsigned long rcTime[PWM_IN_MAX], MotorController motor_controllers[2])
 {
-  //Serial.println(F("#   rc_mode"));//確認用  
+  //Serial.println(F("#   rc_mode"));//確認用
   digitalWrite(LED_BUILTIN, LOW); // RC_MODEでLED消灯
   // 値をそのままへESCへ出力する
-  motor_direct_instructions(rcTime[0], rcTime[2],motor_controllers);
-  //Serial.println("input cmd:" + String(rcTime[0]) + ", " + String(rcTime[2]));
+  if((rcTime[0] < CUGO_PROPO_MAX_A && rcTime[0] > CUGO_PROPO_MIN_A) && (rcTime[2] < CUGO_PROPO_MAX_C && rcTime[2] > CUGO_PROPO_MIN_C) ) {
+    motor_direct_instructions(rcTime[0], rcTime[2], motor_controllers);
+    //Serial.println("input cmd:" + String(rcTime[0]) + ", " + String(rcTime[2]));
+  }
 }
 
 void stop_motor_immediately(MotorController motor_controllers[2])
@@ -480,12 +482,12 @@ void stop_motor_immediately(MotorController motor_controllers[2])
   //Serial.println(F("#   stop_motor_immediately"));//確認用
   motor_controllers[0].setTargetRpm(0.0);
   motor_controllers[1].setTargetRpm(0.0);
-  motor_direct_instructions(1500, 1500,motor_controllers);
+  motor_direct_instructions(1500, 1500, motor_controllers);
 }
 
 void reset_pid_gain(MotorController motor_controllers[2])
 {
-  //Serial.println(F("#   reset_pid_gain"));//確認用  
+  //Serial.println(F("#   reset_pid_gain"));//確認用
   for (int i = 0; i < MOTOR_NUM; i++)
   {
     motor_controllers[i].reset_PID_param();
@@ -494,17 +496,17 @@ void reset_pid_gain(MotorController motor_controllers[2])
 
 void set_button_cmd()
 {
-  //Serial.println(F("#   set_button_cmd"));//確認用  
+  //Serial.println(F("#   set_button_cmd"));//確認用
   button_push_count = 0;
   button_enable = 0;
 }
 
-void go_backward(float distance,float max_velocity)
+void go_backward(float distance, float max_velocity)
 {
-  
+
   if (cmd_init == false)
   {
-  //Serial.println(F("#   go_backward"));//確認用
+    //Serial.println(F("#   go_backward"));//確認用
     if (init_current_cmd >= CMD_SIZE - 1)
     {
       //Serial.println("init_current_cmd: " + String(init_current_cmd));
@@ -515,31 +517,31 @@ void go_backward(float distance,float max_velocity)
     // 初回起動時の処理
     //Serial.println("init_current_cmd: " + String(init_current_cmd));
     calc_necessary_count(distance);
-    //Serial.print(F("target_count_L/R: ")); 
-    //Serial.print(String(-target_count_L)); 
+    //Serial.print(F("target_count_L/R: "));
+    //Serial.print(String(-target_count_L));
     //Serial.print(F(", "));
     //Serial.println(String(-target_count_R));
     float velocity = 0.0;
-    if(max_velocity == EXCEPTION_NO)
+    if (max_velocity == EXCEPTION_NO)
     {
       velocity = 90.0;
-      }else{
+    } else {
       velocity = max_velocity;
     }
-    set_arduino_cmd_matrix(-target_count_L, -target_count_R, EXCEPTION_NO, EXCEPTION_NO, -velocity, -velocity); 
-    if (ARDUINO_MODE == runMode){
+    set_arduino_cmd_matrix(-target_count_L, -target_count_R, EXCEPTION_NO, EXCEPTION_NO, -velocity, -velocity);
+    if (ARDUINO_MODE == runMode) {
       Serial.print(F("###"));
-      if(init_current_cmd < 9)
+      if (init_current_cmd < 9)
         Serial.print(F("0"));
 
-      Serial.print(String(init_current_cmd+1));
+      Serial.print(String(init_current_cmd + 1));
       Serial.print(F("番目のコマンド："));
       Serial.print(String(distance));
       Serial.print(F("m　後ろに進む"));
-      Serial.print(F("(上限速度："));        
+      Serial.print(F("(上限速度："));
       Serial.print(String(velocity));
       Serial.println(F("rpm )"));
-    }        
+    }
     init_current_cmd++;
 
   }
@@ -550,18 +552,18 @@ void go_backward(float distance,float max_velocity)
 }
 void sagaru(float distance)
 {
-  go_backward(distance,EXCEPTION_NO);
+  go_backward(distance, EXCEPTION_NO);
 }
-void sagaru(float distance,float max_velocity)
+void sagaru(float distance, float max_velocity)
 {
-  go_backward(distance,max_velocity);
+  go_backward(distance, max_velocity);
 }
 
-void turn_clockwise(float degree,float max_velocity)
+void turn_clockwise(float degree, float max_velocity)
 {
   if (cmd_init == false)
   {
-  //Serial.println(F("#   turn_clockwise"));//確認用
+    //Serial.println(F("#   turn_clockwise"));//確認用
     if (init_current_cmd >= CMD_SIZE - 1)
     {
       //Serial.println("init_current_cmd: " + String(init_current_cmd));
@@ -574,26 +576,26 @@ void turn_clockwise(float degree,float max_velocity)
     calc_necessary_rotate(degree);
     //Serial.println("target_count_L/R: " + String(target_count_L) + ", " + String(target_count_R));
     float velocity = 0.0;
-     if(max_velocity == EXCEPTION_NO)
+    if (max_velocity == EXCEPTION_NO)
     {
       velocity = 90.0;
-      }else{
+    } else {
       velocity = max_velocity;
-    }   
-    set_arduino_cmd_matrix(target_count_L, target_count_R, EXCEPTION_NO, EXCEPTION_NO, velocity, -velocity); 
-    if (ARDUINO_MODE == runMode){
+    }
+    set_arduino_cmd_matrix(target_count_L, target_count_R, EXCEPTION_NO, EXCEPTION_NO, velocity, -velocity);
+    if (ARDUINO_MODE == runMode) {
       Serial.print(F("###"));
-      if(init_current_cmd < 9)
+      if (init_current_cmd < 9)
         Serial.print(F("0"));
 
-      Serial.print(String(init_current_cmd+1));
+      Serial.print(String(init_current_cmd + 1));
       Serial.print(F("番目のコマンド："));
       Serial.print(String(degree));
       Serial.print(F("度　右回り"));
-      Serial.print(F("(上限速度："));        
+      Serial.print(F("(上限速度："));
       Serial.print(String(velocity));
       Serial.println(F("rpm )"));
-    }        
+    }
     init_current_cmd++;
   }
   else
@@ -604,38 +606,38 @@ void turn_clockwise(float degree,float max_velocity)
 
 void migimawari(float degree)
 {
-  turn_clockwise(degree,EXCEPTION_NO);
+  turn_clockwise(degree, EXCEPTION_NO);
 }
-void migimawari(float degree,float max_velocity)
+void migimawari(float degree, float max_velocity)
 {
-  turn_clockwise(degree,max_velocity);
+  turn_clockwise(degree, max_velocity);
 }
 void migimawari90()
 {
-  migimawari(90,EXCEPTION_NO);
+  migimawari(90, EXCEPTION_NO);
 }
 void migimawari90(float max_velocity)
 {
-  migimawari(90,max_velocity);
+  migimawari(90, max_velocity);
 }
 void migimawari45()
 {
-  migimawari(45,EXCEPTION_NO);
+  migimawari(45, EXCEPTION_NO);
 }
 void migimawari45(float max_velocity)
 {
-  migimawari(45,max_velocity);
+  migimawari(45, max_velocity);
 }
 void migimawari180()
 {
-  migimawari(180,EXCEPTION_NO);
+  migimawari(180, EXCEPTION_NO);
 }
 void migimawari180(float max_velocity)
 {
-  migimawari(180,max_velocity);
+  migimawari(180, max_velocity);
 }
 
-void go_forward(float distance,float max_velocity)
+void go_forward(float distance, float max_velocity)
 {
   if (cmd_init == false)
   {
@@ -645,29 +647,29 @@ void go_forward(float distance,float max_velocity)
     calc_necessary_count(distance);
     //Serial.println("target_count_L/R: " + String(target_count_L) + ", " + String(target_count_R));
     float velocity = 0.0;
-    if(max_velocity == EXCEPTION_NO)
+    if (max_velocity == EXCEPTION_NO)
     {
       velocity = 90.0;
-      }else{
+    } else {
       velocity = max_velocity;
     }
-    set_arduino_cmd_matrix(target_count_L, target_count_R, EXCEPTION_NO, EXCEPTION_NO, velocity, velocity); 
+    set_arduino_cmd_matrix(target_count_L, target_count_R, EXCEPTION_NO, EXCEPTION_NO, velocity, velocity);
     //Serial.println("matrix_target_count_L/R: " + String(arduino_count_cmd_matrix[init_current_cmd][0]) + ", " + String(arduino_count_cmd_matrix[init_current_cmd][0]));
-    if (ARDUINO_MODE == runMode){
+    if (ARDUINO_MODE == runMode) {
       Serial.print(F("###"));
-      if(init_current_cmd < 9)
+      if (init_current_cmd < 9)
         Serial.print(F("0"));
 
-      Serial.print(String(init_current_cmd+1));
+      Serial.print(String(init_current_cmd + 1));
       Serial.print(F("番目のコマンド："));
       Serial.print(String(distance));
       Serial.print(F("m　前に進む "));
       //Serial.print(String(target_count_L));
-      Serial.print(F("(上限速度："));        
+      Serial.print(F("(上限速度："));
       Serial.print(String(velocity));
       Serial.println(F("rpm)"));
 
-    }        
+    }
     init_current_cmd++;
   }
   else
@@ -678,13 +680,13 @@ void go_forward(float distance,float max_velocity)
 
 void susumu(float distance)
 {
-  go_forward(distance,EXCEPTION_NO);
+  go_forward(distance, EXCEPTION_NO);
 }
-void susumu(float distance,float max_velocity){
-  go_forward(distance,max_velocity);
-  
+void susumu(float distance, float max_velocity) {
+  go_forward(distance, max_velocity);
+
 }
-void turn_counter_clockwise(float degree,float max_velocity)
+void turn_counter_clockwise(float degree, float max_velocity)
 {
   if (cmd_init == false)
   {
@@ -700,31 +702,31 @@ void turn_counter_clockwise(float degree,float max_velocity)
     //Serial.println("init_current_cmd: " + String(init_current_cmd));
     calc_necessary_rotate(degree);
     //Serial.print(F("target_count_L/R: "));
-    //Serial.print(String(-target_count_L)); 
-    //Serial.print(F(", ")); 
+    //Serial.print(String(-target_count_L));
+    //Serial.print(F(", "));
     //Serial.println(String(-target_count_R));
 
     float velocity = 0.0;
-    if(max_velocity == EXCEPTION_NO)
+    if (max_velocity == EXCEPTION_NO)
     {
       velocity = 90.0;
-      }else{
+    } else {
       velocity = max_velocity;
-    }   
-    set_arduino_cmd_matrix(-target_count_L, -target_count_R, EXCEPTION_NO, EXCEPTION_NO, -velocity, velocity); 
-    if (ARDUINO_MODE == runMode){
+    }
+    set_arduino_cmd_matrix(-target_count_L, -target_count_R, EXCEPTION_NO, EXCEPTION_NO, -velocity, velocity);
+    if (ARDUINO_MODE == runMode) {
       Serial.print(F("###"));
-      if(init_current_cmd < 9)
+      if (init_current_cmd < 9)
         Serial.print(F("0"));
 
-      Serial.print(String(init_current_cmd+1));
+      Serial.print(String(init_current_cmd + 1));
       Serial.print(F("番目のコマンド："));
       Serial.print(String(degree));
       Serial.print(F("度　左回り "));
-      Serial.print(F("(上限速度："));        
+      Serial.print(F("(上限速度："));
       Serial.print(String(velocity));
       Serial.println(F("rpm)"));
-    }    
+    }
     init_current_cmd++;
   }
   else
@@ -735,40 +737,40 @@ void turn_counter_clockwise(float degree,float max_velocity)
 
 void hidarimawari(float degree)
 {
-  turn_counter_clockwise(degree,EXCEPTION_NO);
+  turn_counter_clockwise(degree, EXCEPTION_NO);
 }
-void hidarimawari(float degree,float max_velocity)
+void hidarimawari(float degree, float max_velocity)
 {
-  turn_counter_clockwise(degree,max_velocity);
+  turn_counter_clockwise(degree, max_velocity);
 }
 void hidarimawari90()
 {
-  hidarimawari(90,EXCEPTION_NO);
+  hidarimawari(90, EXCEPTION_NO);
 }
 void hidarimawari90(float max_velocity)
 {
-  hidarimawari(90,max_velocity);
+  hidarimawari(90, max_velocity);
 }
 void hidarimawari45()
 {
-  hidarimawari(45,EXCEPTION_NO);
+  hidarimawari(45, EXCEPTION_NO);
 }
 void hidarimawari45(float max_velocity)
 {
-  hidarimawari(45,max_velocity);
+  hidarimawari(45, max_velocity);
 }
 void hidarimawari180()
 {
-  hidarimawari(180,EXCEPTION_NO);
+  hidarimawari(180, EXCEPTION_NO);
 }
 void hidarimawari180(float max_velocity)
 {
-  hidarimawari(180,max_velocity);
+  hidarimawari(180, max_velocity);
 }
 
 void reset_arduino_mode_flags()
 {
-  //Serial.println(F("#   reset_arduino_mode_flags"));//確認用  
+  //Serial.println(F("#   reset_arduino_mode_flags"));//確認用
   cmd_init = false;
   current_cmd = 0;
   target_count_L = 0;
@@ -787,7 +789,7 @@ void reset_arduino_mode_flags()
 
 void set_go_forward_cmd(MotorController motor_controllers[2])
 {
-  //Serial.println(F("#   set_go_forward_cmd"));//確認用    
+  //Serial.println(F("#   set_go_forward_cmd"));//確認用
   target_count_L = motor_controllers[0].getCount() + arduino_count_cmd_matrix[current_cmd][0];
   //Serial.println("target_count_L: " + String(target_count_L) + " = " + String(motor_controllers[MOTOR_LEFT].getCount()) + " + " + String(arduino_count_cmd_matrix[current_cmd][0]));
   //while(1);
@@ -807,7 +809,7 @@ void set_go_forward_cmd(MotorController motor_controllers[2])
 
 void view_flags()
 {
-  //Serial.println(F("#   view_flags"));//確認用      
+  //Serial.println(F("#   view_flags"));//確認用
   Serial.println(F(""));
   Serial.println(F("FLAGS"));
   Serial.print(F("cmd_init: "));
@@ -839,35 +841,35 @@ void view_flags()
 
 void check_achievement_spi_cmd()
 {
-  //Serial.println(F("#   check_achievement_spi_cmd"));//確認用      
+  //Serial.println(F("#   check_achievement_spi_cmd"));//確認用
   send_spi(arduino_flag_cmd_matrix[current_cmd][1]);
   spi_done = true;
   Serial.print(F("###"));
-  if(current_cmd < 9)
-        Serial.print(F("0"));
+  if (current_cmd < 9)
+    Serial.print(F("0"));
 
-  Serial.print(String(current_cmd+1));
-  Serial.println(F("番目のコマンド：終了  ###"));    
+  Serial.print(String(current_cmd + 1));
+  Serial.println(F("番目のコマンド：終了  ###"));
 }
 
-void cmd_end(MotorController motor_controllers[2]) 
+void cmd_end(MotorController motor_controllers[2])
 {
 
   if (cmd_init == false)
   {
-    //Serial.println(F("#   cmd_end"));//確認用    
+    //Serial.println(F("#   cmd_end"));//確認用
     // 初回起動時の処理
     //Serial.println("CMD_SIZE: " + String(CMD_SIZE));
     if (init_current_cmd >= CMD_SIZE)
     {
       //Serial.println("init_current_cmd: " + String(init_current_cmd));
-      Serial.println(F("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。")); 
+      Serial.println(F("コマンド上限数以上にコマンドを設定しています。意図しない走行をさせないため強制終了。"));
       while (1);
     }
 
     // 初回起動時の処理をここで無効化
     reset_pid_gain(motor_controllers);
-    if (ARDUINO_MODE == runMode){
+    if (ARDUINO_MODE == runMode) {
       Serial.println(F("###   コマンド準備完了    ###"));
       Serial.println(F("##########################"));
       Serial.println(F("###   コマンド実行開始    ###"));
@@ -900,7 +902,7 @@ void cmd_manager_flags_init(MotorController motor_controllers[2])
   //while(1);
   if (init_current_cmd >= CMD_SIZE - 1)
   {
-    //Serial.print(F("#   init_current_cmd: ")); 
+    //Serial.print(F("#   init_current_cmd: "));
     Serial.println(String(init_current_cmd));
     Serial.println(F("コマンドの上限数以上にコマンドを設定しています。強制終了。"));
     while (1);
@@ -928,49 +930,49 @@ void cmd_manager_flags_init(MotorController motor_controllers[2])
     //Serial.println(F("すべてのコマンド実行完了。または、初期化のままでコマンド入力できていない。"));
     //view_flags();
     end_arduino_mode = true;
-  }else{
-          
-          Serial.print(F("###"));
-          if(current_cmd < 9)
-          Serial.print(F("0"));
-          
-          Serial.print(String(current_cmd+1));
-          Serial.print(F("番目のコマンド：開始  "));
-          /*
-          float degree = 0 ;
-          float distance = 0 ;
-          if(arduino_flag_cmd_matrix[current_cmd][0] != EXCEPTION_NO)//実際の待ち時間確認
-          {
-          Serial.print(String(arduino_flag_cmd_matrix[current_cmd][0]));
-          Serial.print(F("ミリ秒　待つ"));
-          }else if(arduino_flag_cmd_matrix[current_cmd][1] == 255)//ボタン押し待ち
-          {
-          Serial.print(F("ボタン　押し待ち"));
-          }else if(arduino_flag_cmd_matrix[current_cmd][2] > 0 && arduino_flag_cmd_matrix[current_cmd][3] > 0)//前進
-          {
-          distance =  (arduino_count_cmd_matrix[current_cmd][0]) * (( 2 * wheel_radius_l * PI) / encoder_resolution );
-          Serial.print(String(abs(distance)));        
-          Serial.print(F(" m　前進"));              
-          }else if(arduino_flag_cmd_matrix[current_cmd][2] < 0 && arduino_flag_cmd_matrix[current_cmd][3] > 0)//左回り
-          {
-          degree = (2 * wheel_radius_l * PI * arduino_count_cmd_matrix[current_cmd][0] * 360) / (encoder_resolution * tread * PI);
-          Serial.print(String(abs(degree)));                      
-          Serial.print(F(" 度　左回り"));              
-          }else if(arduino_flag_cmd_matrix[current_cmd][2] > 0 && arduino_flag_cmd_matrix[current_cmd][3] < 0)//右回り
-          {
-          degree = (2 * wheel_radius_l * PI * arduino_count_cmd_matrix[current_cmd][0] * 360) / (encoder_resolution * tread * PI);
-          Serial.print(String(abs(degree)));                      
-          Serial.print(F(" 度　右回り"));
-          }else if(arduino_flag_cmd_matrix[current_cmd][2] < 0 && arduino_flag_cmd_matrix[current_cmd][3] < 0)//後進
-          {
-          distance =  (arduino_count_cmd_matrix[current_cmd][0]) * (( 2 * wheel_radius_l * PI) / encoder_resolution );
-          Serial.print(String(abs(distance)));        
-          Serial.print(F(" m　後進"));                
-          }else{
-          Serial.print(F("不明なコマンド"));  
-          }*/
-          
-          Serial.println(F("###"));
+  } else {
+
+    Serial.print(F("###"));
+    if (current_cmd < 9)
+      Serial.print(F("0"));
+
+    Serial.print(String(current_cmd + 1));
+    Serial.print(F("番目のコマンド：開始  "));
+    /*
+      float degree = 0 ;
+      float distance = 0 ;
+      if(arduino_flag_cmd_matrix[current_cmd][0] != EXCEPTION_NO)//実際の待ち時間確認
+      {
+      Serial.print(String(arduino_flag_cmd_matrix[current_cmd][0]));
+      Serial.print(F("ミリ秒　待つ"));
+      }else if(arduino_flag_cmd_matrix[current_cmd][1] == 255)//ボタン押し待ち
+      {
+      Serial.print(F("ボタン　押し待ち"));
+      }else if(arduino_flag_cmd_matrix[current_cmd][2] > 0 && arduino_flag_cmd_matrix[current_cmd][3] > 0)//前進
+      {
+      distance =  (arduino_count_cmd_matrix[current_cmd][0]) * (( 2 * wheel_radius_l * PI) / encoder_resolution );
+      Serial.print(String(abs(distance)));
+      Serial.print(F(" m　前進"));
+      }else if(arduino_flag_cmd_matrix[current_cmd][2] < 0 && arduino_flag_cmd_matrix[current_cmd][3] > 0)//左回り
+      {
+      degree = (2 * wheel_radius_l * PI * arduino_count_cmd_matrix[current_cmd][0] * 360) / (encoder_resolution * tread * PI);
+      Serial.print(String(abs(degree)));
+      Serial.print(F(" 度　左回り"));
+      }else if(arduino_flag_cmd_matrix[current_cmd][2] > 0 && arduino_flag_cmd_matrix[current_cmd][3] < 0)//右回り
+      {
+      degree = (2 * wheel_radius_l * PI * arduino_count_cmd_matrix[current_cmd][0] * 360) / (encoder_resolution * tread * PI);
+      Serial.print(String(abs(degree)));
+      Serial.print(F(" 度　右回り"));
+      }else if(arduino_flag_cmd_matrix[current_cmd][2] < 0 && arduino_flag_cmd_matrix[current_cmd][3] < 0)//後進
+      {
+      distance =  (arduino_count_cmd_matrix[current_cmd][0]) * (( 2 * wheel_radius_l * PI) / encoder_resolution );
+      Serial.print(String(abs(distance)));
+      Serial.print(F(" m　後進"));
+      }else{
+      Serial.print(F("不明なコマンド"));
+      }*/
+
+    Serial.println(F("###"));
 
   }
   // ここに入ったら誤作動
@@ -997,22 +999,22 @@ void check_achievement_go_forward_cmd(MotorController motor_controllers[2])// mo
   if (cmd_L_back == false) {
     if (target_count_L < motor_controllers[0].getCount())
       L_done = true;
-      //Serial.println(F("#   L_done"));
+    //Serial.println(F("#   L_done"));
   } else {
     if (target_count_L > motor_controllers[0].getCount())
       L_done = true;
-      //Serial.println(F("#   L_done"));      
+    //Serial.println(F("#   L_done"));
   }
 
   // R側目標達成チェック
   if (cmd_R_back == false) {
     if (target_count_R < motor_controllers[1].getCount())
       R_done = true;
-      //Serial.println(F("#   R_done"));
+    //Serial.println(F("#   R_done"));
   } else {
     if (target_count_R > motor_controllers[1].getCount())
       R_done = true;
-      //Serial.println(F("#   R_done"));      
+    //Serial.println(F("#   R_done"));
   }
 
   if (L_done == true)
@@ -1030,36 +1032,36 @@ void check_achievement_go_forward_cmd(MotorController motor_controllers[2])// mo
     stop_motor_immediately(motor_controllers);
     count_done = true;
     Serial.print(F("###"));
-    if(current_cmd < 9)
-        Serial.print(F("0"));
+    if (current_cmd < 9)
+      Serial.print(F("0"));
 
-    Serial.print(String(current_cmd+1));
+    Serial.print(String(current_cmd + 1));
     Serial.print(F("番目のコマンド：終了  "));
     double degree = 0 ;
     double distance = 0 ;
-    if(arduino_flag_cmd_matrix[current_cmd][2] > 0 && arduino_flag_cmd_matrix[current_cmd][3] > 0)//前進
+    if (arduino_flag_cmd_matrix[current_cmd][2] > 0 && arduino_flag_cmd_matrix[current_cmd][3] > 0) //前進
     {
-    //distance =  (motor_controllers[0].getCount()) * (( 2 * wheel_radius_l * PI) / encoder_resolution);
-    distance = motor_controllers[0].getCount() * conversion_count_to_distance;
-    Serial.print(String(fabsf(distance)));            
-    Serial.print(F(" m　進んだ"));              
-    }else if(arduino_flag_cmd_matrix[current_cmd][2] < 0 && arduino_flag_cmd_matrix[current_cmd][3] > 0)//左回り
+      //distance =  (motor_controllers[0].getCount()) * (( 2 * wheel_radius_l * PI) / encoder_resolution);
+      distance = motor_controllers[0].getCount() * conversion_count_to_distance;
+      Serial.print(String(fabsf(distance)));
+      Serial.print(F(" m　進んだ"));
+    } else if (arduino_flag_cmd_matrix[current_cmd][2] < 0 && arduino_flag_cmd_matrix[current_cmd][3] > 0) //左回り
     {
-    degree = (2 * wheel_radius_l * PI * motor_controllers[0].getCount() * 360) / (encoder_resolution * tread * PI);
-    Serial.print(String(abs(degree)));            
-    Serial.print(F(" 度　左回りに回転した"));              
-    }else if(arduino_flag_cmd_matrix[current_cmd][2] > 0 && arduino_flag_cmd_matrix[current_cmd][3] < 0)//右回り
+      degree = (2 * wheel_radius_l * PI * motor_controllers[0].getCount() * 360) / (encoder_resolution * tread * PI);
+      Serial.print(String(abs(degree)));
+      Serial.print(F(" 度　左回りに回転した"));
+    } else if (arduino_flag_cmd_matrix[current_cmd][2] > 0 && arduino_flag_cmd_matrix[current_cmd][3] < 0) //右回り
     {
-    degree = (2 * wheel_radius_l * PI * motor_controllers[0].getCount() * 360) / (encoder_resolution * tread * PI);
-    Serial.print(String(abs(degree)));            
-    Serial.print(F(" 度　右回りに回転した"));
-    }else if(arduino_flag_cmd_matrix[current_cmd][2] < 0 && arduino_flag_cmd_matrix[current_cmd][3] < 0)//後進
+      degree = (2 * wheel_radius_l * PI * motor_controllers[0].getCount() * 360) / (encoder_resolution * tread * PI);
+      Serial.print(String(abs(degree)));
+      Serial.print(F(" 度　右回りに回転した"));
+    } else if (arduino_flag_cmd_matrix[current_cmd][2] < 0 && arduino_flag_cmd_matrix[current_cmd][3] < 0) //後進
     {
-    distance =  (motor_controllers[0].getCount()) * (( 2 * wheel_radius_l * PI) / encoder_resolution);
-    Serial.print(String(abs(distance)));        
-    Serial.print(F(" m　後に進んだ"));
-    }else{
-    Serial.print(F("不明なコマンド"));  
+      distance =  (motor_controllers[0].getCount()) * (( 2 * wheel_radius_l * PI) / encoder_resolution);
+      Serial.print(String(abs(distance)));
+      Serial.print(F(" m　後に進んだ"));
+    } else {
+      Serial.print(F("不明なコマンド"));
     }
     Serial.println(F("  ###"));
 
@@ -1122,13 +1124,13 @@ void cmd_manager(MotorController motor_controllers[2])
       float r_count_p;  // P制御値
       float r_count_i;  // I制御値
       float r_count_d;  // D制御値
-      if(arduino_flag_cmd_matrix[current_cmd][2] == 0 && arduino_flag_cmd_matrix[current_cmd][3] == 0)
+      if (arduino_flag_cmd_matrix[current_cmd][2] == 0 && arduino_flag_cmd_matrix[current_cmd][3] == 0)
       {
         //停止しているだけの時
         motor_controllers[0].setTargetRpm(arduino_flag_cmd_matrix[current_cmd][2]);
         motor_controllers[1].setTargetRpm(arduino_flag_cmd_matrix[current_cmd][3]);
 
-      } else{
+      } else {
         // 各制御値の計算
         l_count_p = arduino_count_cmd_matrix[current_cmd][0] - motor_controllers[0].getCount();
         l_count_i = l_count_prev_i_ + l_count_p;
@@ -1137,23 +1139,23 @@ void cmd_manager(MotorController motor_controllers[2])
         r_count_i = r_count_prev_i_ + r_count_p;
         r_count_d = r_count_p - r_count_prev_p_;
 
-        l_count_i = min( max(l_count_i,-L_MAX_COUNT_I),L_MAX_COUNT_I);        
-        r_count_i = min( max(r_count_i,-R_MAX_COUNT_I),R_MAX_COUNT_I);
+        l_count_i = min( max(l_count_i, -L_MAX_COUNT_I), L_MAX_COUNT_I);
+        r_count_i = min( max(r_count_i, -R_MAX_COUNT_I), R_MAX_COUNT_I);
         // PID制御
-        l_count_gain = l_count_p * L_COUNT_KP + l_count_i * L_COUNT_KI + l_count_d * L_COUNT_KD;  
-        r_count_gain = r_count_p * R_COUNT_KP + r_count_i * R_COUNT_KI + r_count_d * R_COUNT_KD;  
+        l_count_gain = l_count_p * L_COUNT_KP + l_count_i * L_COUNT_KI + l_count_d * L_COUNT_KD;
+        r_count_gain = r_count_p * R_COUNT_KP + r_count_i * R_COUNT_KI + r_count_d * R_COUNT_KD;
         // prev_ 更新
         l_count_prev_p_ = l_count_p;
         l_count_prev_i_ = l_count_i;
         r_count_prev_p_ = r_count_p;
         r_count_prev_i_ = r_count_i;
 
-        l_count_gain = min( max(l_count_gain,-MAX_MOTOR_RPM),MAX_MOTOR_RPM);//モーターの速度上限        
-        r_count_gain = min( max(r_count_gain,-MAX_MOTOR_RPM),MAX_MOTOR_RPM);//モーターの速度上限        
-        l_count_gain = min( max(l_count_gain,-fabsf(arduino_flag_cmd_matrix[current_cmd][2])),fabsf(arduino_flag_cmd_matrix[current_cmd][2]));//ユーザ設定の速度上限        
-        r_count_gain = min( max(r_count_gain,-fabsf(arduino_flag_cmd_matrix[current_cmd][3])),fabsf(arduino_flag_cmd_matrix[current_cmd][3]));//ユーザ設定の速度上限        
+        l_count_gain = min( max(l_count_gain, -MAX_MOTOR_RPM), MAX_MOTOR_RPM); //モーターの速度上限
+        r_count_gain = min( max(r_count_gain, -MAX_MOTOR_RPM), MAX_MOTOR_RPM); //モーターの速度上限
+        l_count_gain = min( max(l_count_gain, -fabsf(arduino_flag_cmd_matrix[current_cmd][2])), fabsf(arduino_flag_cmd_matrix[current_cmd][2])); //ユーザ設定の速度上限
+        r_count_gain = min( max(r_count_gain, -fabsf(arduino_flag_cmd_matrix[current_cmd][3])), fabsf(arduino_flag_cmd_matrix[current_cmd][3])); //ユーザ設定の速度上限
 
-           
+
         //位置制御
         motor_controllers[MOTOR_LEFT].setTargetRpm(l_count_gain);
         motor_controllers[MOTOR_RIGHT].setTargetRpm(r_count_gain);
@@ -1161,8 +1163,8 @@ void cmd_manager(MotorController motor_controllers[2])
         //Serial.print(String(l_count_gain));
         //Serial.print(F(","));
         //Serial.println(String(r_count_gain));
-        }
-      
+      }
+
       // 成功条件の確認
       // if conuntの成功条件
       if (count_done == false)
@@ -1192,19 +1194,19 @@ void cmd_manager(MotorController motor_controllers[2])
         r_count_prev_p_ = 0;
         l_count_gain = 0;
         r_count_gain = 0;
-        
+
         current_cmd++;
 
         if (end_arduino_mode == true)
         {
           Serial.println(F("###   コマンド実行終了    ###"));
-          Serial.println(F("##########################"));          
+          Serial.println(F("##########################"));
           reset_arduino_mode_flags();
           end_arduino_mode = false;
           runMode = RC_MODE;
-          Serial.println(F("##########################"));                  
+          Serial.println(F("##########################"));
           Serial.println(F("###   モード:RC_MODE    ###"));
-          Serial.println(F("##########################"));            
+          Serial.println(F("##########################"));
         }
       }
     }
@@ -1225,18 +1227,18 @@ void check_achievement_button_cmd(MotorController motor_controllers[2])
     stop_motor_immediately(motor_controllers);
     button_done = true;
     Serial.print(F("###"));
-    if(current_cmd < 9)
-        Serial.print(F("0"));
+    if (current_cmd < 9)
+      Serial.print(F("0"));
 
-    Serial.print(String(current_cmd+1));
-    Serial.println(F("番目のコマンド：終了  ボタン　押された  ###"));    
+    Serial.print(String(current_cmd + 1));
+    Serial.println(F("番目のコマンド：終了  ボタン　押された  ###"));
   }
 }
 
 void init_display()
 {
   Serial.println(F(""));
-  Serial.println(F(""));  
+  Serial.println(F(""));
   Serial.println(F("#######################################"));
   Serial.println(F("#######################################"));
   Serial.println(F("#                                     #"));
@@ -1251,21 +1253,21 @@ void init_display()
   Serial.println(F("#######################################"));
   Serial.println(F("#######################################"));
   Serial.println(F(""));
-  Serial.println(F(""));  
-  Serial.println(F("##########################"));  
+  Serial.println(F(""));
+  Serial.println(F("##########################"));
   Serial.println(F("### CugoAruduinoKit起動 ###"));
   Serial.println(F("##########################"));
-   
+
 }
 
 
 
 void job_100ms(MotorController motor_controllers[2])//100msごとに必要な情報を表示
 {
-  display_speed(motor_controllers,ENCODER_DISPLAY);
-  display_target_rpm(motor_controllers,ENCODER_DISPLAY);
-  display_PID(motor_controllers,PID_CONTROLL_DISPLAY);
-  display_failsafe(FAIL_SAFE_DISPLAY,runMode);
+  display_speed(motor_controllers, ENCODER_DISPLAY);
+  display_target_rpm(motor_controllers, ENCODER_DISPLAY);
+  display_PID(motor_controllers, PID_CONTROLL_DISPLAY);
+  display_failsafe(FAIL_SAFE_DISPLAY, runMode);
 }
 
 void job_1000ms()//1000msごとに必要な情報があれば表示
@@ -1275,7 +1277,7 @@ void job_1000ms()//1000msごとに必要な情報があれば表示
 
 void display_detail(MotorController motor_controllers[2])
 {
-  if (current_time - prev_time_100ms > 100000) 
+  if (current_time - prev_time_100ms > 100000)
   {
     job_100ms(motor_controllers);
     prev_time_100ms = current_time;

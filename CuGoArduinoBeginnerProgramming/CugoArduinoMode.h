@@ -82,8 +82,14 @@
 #define ARDUINO_MODE 1
 
 //各種閾値
-#define ARDUINO_MODE_IN   1700  // ARDUINOモードに入るときの閾値(us) (1100~1900/中央1500)
-#define ARDUINO_MODE_OUT  1300  // ARDUINOモードから抜けるときの閾値(us) (1100~1900/中央1500)
+#define ARDUINO_MODE_IN 1700  // ARDUINOモードに入るときの閾値(us) (1100~1900/中央1500)
+#define ARDUINO_MODE_OUT 1300  // ARDUINOモードから抜けるときの閾値(us) (1100~1900/中央1500)
+#define CUGO_PROPO_MAX_A 2200
+#define CUGO_PROPO_MIN_A 800
+#define CUGO_PROPO_MAX_B 1900
+#define CUGO_PROPO_MIN_B 1100
+#define CUGO_PROPO_MAX_C 2200
+#define CUGO_PROPO_MIN_C 800
 #define CMD_SIZE 60 //　コマンド数上限
 #define EXCEPTION_NO -32768 //int下限
 

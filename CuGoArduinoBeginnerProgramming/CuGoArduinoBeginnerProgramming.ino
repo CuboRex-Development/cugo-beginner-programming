@@ -115,7 +115,7 @@ void check_mode_change()
   rcTime[2] = time[2];
   interrupts();     //割り込み開始
 
-  if (ARDUINO_MODE_IN < rcTime[1])
+  if (ARDUINO_MODE_IN < rcTime[1] && rcTime[1] < CUGO_PROPO_MAX_B) // MR-8の外れ値が入ったときは遷移させない
   {
     if (runMode != ARDUINO_MODE)
     { // モードが変わった時(RC→ARDUINO)
@@ -128,7 +128,7 @@ void check_mode_change()
     }
     runMode = ARDUINO_MODE;
   }
-  else if (ARDUINO_MODE_OUT > rcTime[1])
+  else if (ARDUINO_MODE_OUT > rcTime[1] && CUGO_PROPO_MIN_B < rcTime[1]) // MR-8の外れ値が入ったときは遷移させない
   {
     if (runMode != RC_MODE)
     { // モードが変わった時(ARDUINO→RC)
