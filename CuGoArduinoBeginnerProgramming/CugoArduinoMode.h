@@ -152,12 +152,12 @@ extern volatile unsigned long time[PWM_IN_MAX];
 //各種関数
   void init_display();
   void init_SPI();
-  void init_KOPROPO(int runMode,int OLD_PWM_IN_PIN0_VALUE,int OLD_PWM_IN_PIN1_VALUE,int OLD_PWM_IN_PIN2_VALUE);
+  void init_KOPROPO();
   void init_ARDUINO_CMD();
   void set_arduino_cmd_matrix(long int cmd_0,long  int cmd_1, int cmd_2, int cmd_3,int cmd_4,int cmd_5);
   void send_spi(int mode);
   void view_arduino_cmd_matrix();
-  void display_failsafe(bool FAIL_SAFE_DISPLAY,int runMode);
+  void display_failsafe(bool FAIL_SAFE_DISPLAY);
   void display_nothing();
   void spi_cmd(int spi_cmd_value);
   void calc_necessary_rotate(float degree); 

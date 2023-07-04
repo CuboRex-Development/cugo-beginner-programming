@@ -40,7 +40,7 @@ unsigned long long current_time = 0; // オーバーフローしても問題な�
 unsigned long long prev_time_10ms = 0; // オーバーフローしても問題ないが64bit確保
 unsigned long long prev_time_100ms = 0; // オーバーフローしても問題ないが64bit確保
 unsigned long long prev_time_1000ms = 0; // オーバーフローしても問題ないが64bit確保
-int runMode = ARDUINO_MODE;
+int runMode = RC_MODE;
 // PID位置制御のデータ格納
 float l_count_prev_i_ = 0;
 float l_count_prev_p_ = 0;
@@ -72,7 +72,7 @@ void send_spi(int mode) {
   digitalWrite(SS, HIGH);
 }
 
-void init_KOPROPO(int runMode, int OLD_PWM_IN_PIN0_VALUE, int OLD_PWM_IN_PIN1_VALUE, int OLD_PWM_IN_PIN2_VALUE)
+void init_KOPROPO()
 {
   //Serial.println(F("#   init_KOPROPO"));//確認用
   // ピン変化割り込みの初期状態保存
@@ -132,7 +132,7 @@ void view_arduino_cmd_matrix()
 
 }
 
-void display_failsafe(bool FAIL_SAFE_DISPLAY, int runMode)
+void display_failsafe(bool FAIL_SAFE_DISPLAY)
 {
   //Serial.println(F("#   display_failsafe"));//確認用
   if (FAIL_SAFE_DISPLAY == true)
@@ -1267,7 +1267,7 @@ void job_100ms(MotorController motor_controllers[2])//100msごとに必要な情
   display_speed(motor_controllers, ENCODER_DISPLAY);
   display_target_rpm(motor_controllers, ENCODER_DISPLAY);
   display_PID(motor_controllers, PID_CONTROLL_DISPLAY);
-  display_failsafe(FAIL_SAFE_DISPLAY, runMode);
+  display_failsafe(FAIL_SAFE_DISPLAY);
 }
 
 void job_1000ms()//1000msごとに必要な情報があれば表示

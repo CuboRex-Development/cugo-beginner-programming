@@ -38,7 +38,7 @@ void setup()
   Serial.begin(115200);
   init_display();
   init_PID();
-  init_KOPROPO(runMode,OLD_PWM_IN_PIN0_VALUE,OLD_PWM_IN_PIN1_VALUE,OLD_PWM_IN_PIN2_VALUE);
+  init_KOPROPO();
   init_ARDUINO_CMD();
   init_SPI();
 }
