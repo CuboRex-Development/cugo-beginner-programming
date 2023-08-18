@@ -36,6 +36,8 @@ MotorController motor_controllers[2];
 void setup()
 {
   Serial.begin(115200);
+  stop_motor_immediately(motor_controllers);
+  delay(1000);
   init_display();
   init_PID();
   init_KOPROPO(runMode,OLD_PWM_IN_PIN0_VALUE,OLD_PWM_IN_PIN1_VALUE,OLD_PWM_IN_PIN2_VALUE);
@@ -227,13 +229,13 @@ void CMD_EXECUTE()
 
   //例：ボタンが押されたら1mの正方形を描く動き
   
-  button();//ボタンが押されるまで待つ
+//  button();//ボタンが押されるまで待つ
 
   susumu(1.0);//1.0m 進む
   matsu(1000);//1000ミリ秒(1秒) 待つ
   migimawari90();//右回りに90度回転
   matsu(1000);//1000ミリ秒(1秒) 待つ
-   
+  
   susumu(1.0);
   matsu(1000);
   migimawari90();

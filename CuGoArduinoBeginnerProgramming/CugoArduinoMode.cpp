@@ -6,6 +6,7 @@ bool UDP_CONNECTION_DISPLAY = false;
 bool ENCODER_DISPLAY = false;
 bool PID_CONTROLL_DISPLAY = false;
 bool FAIL_SAFE_DISPLAY = false;
+bool INPUT_OUTPUT_DISPLAY = true;
 
 // 回転方向ソフトウェア切り替え
 const bool L_reverse = false;
@@ -40,7 +41,7 @@ unsigned long long current_time = 0; // オーバーフローしても問題な�
 unsigned long long prev_time_10ms = 0; // オーバーフローしても問題ないが64bit確保
 unsigned long long prev_time_100ms = 0; // オーバーフローしても問題ないが64bit確保
 unsigned long long prev_time_1000ms = 0; // オーバーフローしても問題ないが64bit確保
-int runMode = ARDUINO_MODE;
+int runMode = RC_MODE;
 // PID位置制御のデータ格納
 float l_count_prev_i_ = 0;
 float l_count_prev_p_ = 0;
@@ -473,7 +474,9 @@ void rc_mode(volatile unsigned long rcTime[PWM_IN_MAX], MotorController motor_co
   // 値をそのままへESCへ出力する
   if((rcTime[0] < CUGO_PROPO_MAX_A && rcTime[0] > CUGO_PROPO_MIN_A) && (rcTime[2] < CUGO_PROPO_MAX_C && rcTime[2] > CUGO_PROPO_MIN_C) ) {
     motor_direct_instructions(rcTime[0], rcTime[2], motor_controllers);
-    //Serial.println("input cmd:" + String(rcTime[0]) + ", " + String(rcTime[2]));
+    if(INPUT_OUTPUT_DISPLAY){
+      Serial.println("input cmd:" + String(rcTime[0]) + ", " + String(rcTime[2]) + " B-ch: " + String(rcTime[1]));
+    }
   }
 }
 
@@ -836,6 +839,8 @@ void view_flags()
   Serial.println(String(button_push_count));
   Serial.print(F("button_enable: "));
   Serial.println(String(button_enable));
+  Serial.print(F("button_read: "));
+  Serial.println(String(digitalRead(CMD_BUTTON_PIN)));
   Serial.println(F(""));
 }
 
@@ -1268,6 +1273,7 @@ void job_100ms(MotorController motor_controllers[2])//100msごとに必要な情
   display_target_rpm(motor_controllers, ENCODER_DISPLAY);
   display_PID(motor_controllers, PID_CONTROLL_DISPLAY);
   display_failsafe(FAIL_SAFE_DISPLAY, runMode);
+  view_flags();
 }
 
 void job_1000ms()//1000msごとに必要な情報があれば表示
