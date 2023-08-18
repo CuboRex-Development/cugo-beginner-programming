@@ -36,6 +36,7 @@ MotorController motor_controllers[2];
 void setup()
 {
   Serial.begin(115200);
+  //Serial.println("シリアル通信スタート");
   stop_motor_immediately(motor_controllers);
   delay(1000);
   init_display();
@@ -43,6 +44,7 @@ void setup()
   init_KOPROPO(runMode,OLD_PWM_IN_PIN0_VALUE,OLD_PWM_IN_PIN1_VALUE,OLD_PWM_IN_PIN2_VALUE);
   init_ARDUINO_CMD();
   init_SPI();
+  //Serial.println("init処理完了,通常ループに移行.");
 }
 
 //loop内を繰り返し実行

@@ -6,7 +6,7 @@ bool UDP_CONNECTION_DISPLAY = false;
 bool ENCODER_DISPLAY = false;
 bool PID_CONTROLL_DISPLAY = false;
 bool FAIL_SAFE_DISPLAY = false;
-bool INPUT_OUTPUT_DISPLAY = true;
+bool INPUT_OUTPUT_DISPLAY = false;
 
 // 回転方向ソフトウェア切り替え
 const bool L_reverse = false;
@@ -1273,7 +1273,7 @@ void job_100ms(MotorController motor_controllers[2])//100msごとに必要な情
   display_target_rpm(motor_controllers, ENCODER_DISPLAY);
   display_PID(motor_controllers, PID_CONTROLL_DISPLAY);
   display_failsafe(FAIL_SAFE_DISPLAY, runMode);
-  view_flags();
+  //view_flags();
 }
 
 void job_1000ms()//1000msごとに必要な情報があれば表示
