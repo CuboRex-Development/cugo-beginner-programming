@@ -45,7 +45,7 @@ void setup()
   delay(1000);
   ld2_set_control_mode(RC_MODE);//mode{0:RC_mode 1:CMD_Mode}
   delay(1000);
-  pinMode(CMD_BUTTON_PIN, INPUT_PULLUP);
+  //pinMode(CMD_BUTTON_PIN, INPUT_PULLUP);
   init_ARDUINO_CMD();//ARDUINOコマンド初期化
   init_display();//起動時モニタ表示
 }
@@ -59,7 +59,7 @@ void loop()
     job_10ms();
     prev_time_10ms = current_time;
   }
-  //display_detail();
+  display_detail();
 }
 
 //モード切り替わり確認
@@ -113,7 +113,6 @@ void CMD_EXECUTE()
   // ここから↓を改造していこう！
 
   //例：ボタンが押されたら1mの正方形を描く動き
-  button(); 
   matsu(1000);//1000ミリ秒(1秒) 待つ
 
   susumu(1.0);//1m前に進む

@@ -2,8 +2,8 @@
 
 
 /***** ↓必要に応じて各ユーザーごとに設定可能↓ *****/
-
-
+  bool ENCODER_DISPLAY = false;
+  bool FAIL_SAFE_DISPLAY = false;
 /***** ↑必要に応じて各ユーザーごとに設定可能↑ *****/
 
 //グローバル変数宣言
@@ -53,6 +53,8 @@
   float r_count_prev_p_ = 0;
   float l_count_gain = 0;
   float r_count_gain = 0;
+  bool PID_CONTROLL_DISPLAY = false;
+
 
 //ld2関連
   volatile long ld2_id  = 0;
@@ -98,7 +100,7 @@ void set_wait_time_cmd()
 
 }
 
-void wait_time(int milisec)
+void wait_time(long int milisec)
 {
 
   if (cmd_init == false)
@@ -112,7 +114,7 @@ void wait_time(int milisec)
       while (1);
     }
     // 初回起動時の処理
-    set_arduino_cmd_matrix(EXCEPTION_NO, EXCEPTION_NO, milisec, EXCEPTION_NO, 0, 0);
+
     if (ARDUINO_MODE == run_mode) {
       Serial.print(F("###"));
       if (init_current_cmd < 9)
@@ -123,6 +125,15 @@ void wait_time(int milisec)
       Serial.print(String(milisec));
       Serial.println(F("ms待つ"));
     }
+    if (0 <= milisec && milisec <= TIME_MAX ){
+    set_arduino_cmd_matrix(EXCEPTION_NO, EXCEPTION_NO, milisec, EXCEPTION_NO, 0, 0);
+    }else{
+        Serial.println(F("## BAD CASE!! ##"));
+        Serial.println(F("時間が0以下または、計測上限を超えています。"));
+        stop_motor_immediately();
+        while (1);
+    }
+
     init_current_cmd++;
 
   }
@@ -150,12 +161,12 @@ void check_achievement_wait_time_cmd( )
   }
 }
 
-void matsu(int milisec)
+void matsu(long int milisec)
 {
   wait_time(milisec);
 }
 
-void matu(int milisec)
+void matu(long int milisec)
 {
   wait_time(milisec);
 }
@@ -247,9 +258,6 @@ void button()
 void motor_direct_instructions(int left, int right  ) // motor_controllers[0] MOTOR_LEFT motor_controllers[1] MOTOR_RIGHT
 {
   //Serial.println(F("#   motor_direct_instructions"));//確認用
-  //motor_controllers[0].servo_.writeMicroseconds(left);
-  //motor_controllers[1].servo_.writeMicroseconds(right);
-
     unsigned char frame[10] = { 0xFF, 0x02, 0, 0, 0, 0, 0, 0, 0, 0 };
     ld2_float_to_frame(left , 2, frame);
     ld2_float_to_frame(right, 6, frame);
@@ -260,24 +268,20 @@ void motor_direct_instructions(int left, int right  ) // motor_controllers[0] MO
 void stop_motor_immediately( )
 {
   //Serial.println(F("#   stop_motor_immediately"));//確認用
-  //motor_controllers[0].setTargetRpm(0.0);
-  //motor_controllers[1].setTargetRpm(0.0);
-  //motor_direct_instructions(1500, 1500);
   unsigned char frame[10] = { 0xFF, 0x02, 0, 0, 0, 0, 0, 0, 0, 0 };
   ld2_float_to_frame(0 , 2, frame);
   ld2_float_to_frame(0, 6, frame);
-  //ld2_write_cmd(frame);        
-
+  ld2_write_cmd(frame);        
 }
 
 void reset_pid_gain( )
 {
-        l_count_prev_i_ = 0;
-        l_count_prev_p_ = 0;
-        r_count_prev_i_ = 0;
-        r_count_prev_p_ = 0;
-        l_count_gain = 0;
-        r_count_gain = 0;
+  l_count_prev_i_ = 0;
+  l_count_prev_p_ = 0;
+  r_count_prev_i_ = 0;
+  r_count_prev_p_ = 0;
+  l_count_gain = 0;
+  r_count_gain = 0;
 }
 
 void go_backward(float distance, float max_velocity)
@@ -317,9 +321,8 @@ void go_backward(float distance, float max_velocity)
       Serial.print(F("番目のコマンド："));
       
       if(velocity <= 0) {
-        Serial.println(F("不明なコマンド"));
         Serial.println(F("## BAD CASE!! ##"));
-        Serial.println(F("上限速度が0以下です"));
+        Serial.println(F("不正な値：上限速度が0以下です"));
         stop_motor_immediately();
         while (1);
       }
@@ -382,9 +385,8 @@ void turn_clockwise(float degree, float max_velocity)
       Serial.print(F("番目のコマンド："));
 
       if(velocity <= 0) {
-        Serial.println(F("不明なコマンド"));
         Serial.println(F("## BAD CASE!! ##"));
-        Serial.println(F("上限速度が0以下です"));
+        Serial.println(F("不正な値：上限速度が0以下です"));
         stop_motor_immediately();
         while (1);
       }
@@ -471,9 +473,8 @@ void go_forward(float distance, float max_velocity)
       Serial.print(F("番目のコマンド："));
       
       if(velocity <= 0) {
-        Serial.println(F("不明なコマンド"));
         Serial.println(F("## BAD CASE!! ##"));
-        Serial.println(F("上限速度が0以下です"));
+        Serial.println(F("不正な値：上限速度が0以下です"));
         stop_motor_immediately();
         while (1);
       }
@@ -545,9 +546,8 @@ void turn_counter_clockwise(float degree, float max_velocity)
       Serial.print(F("番目のコマンド："));
 
       if(velocity <= 0) {
-        Serial.println(F("不明なコマンド"));
         Serial.println(F("## BAD CASE!! ##"));
-        Serial.println(F("上限速度が0以下です"));
+        Serial.println(F("不正な値：上限速度が0以下です"));
         stop_motor_immediately();
         while (1);
       }
@@ -1024,13 +1024,14 @@ void cmd_manager( )
 
 void check_achievement_button_cmd( )
 {
+  /*
   if (digitalRead(CMD_BUTTON_PIN) == 0)
   {
     button_push_count++;
   } else {
     button_push_count = 0;
   }
-
+  */
   if (button_push_count >= 5) // 実測で50ms以上長いと小刻みに押したとき反応しないと感じてしまう。
   {
     //stop_motor_immediately( );
@@ -1239,10 +1240,6 @@ void set_button_cmd()
 
 //未使用変数および関数　※シーケンスに影響あり
 //表示関連
-  bool UDP_CONNECTION_DISPLAY = false;
-  bool ENCODER_DISPLAY = false;
-  bool PID_CONTROLL_DISPLAY = false;
-  bool FAIL_SAFE_DISPLAY = false;
 
 void init_SPI(){
     //Serial.println(F("#   init_SPI"));//確認用
@@ -1313,14 +1310,6 @@ int split(String data, char delimiter, String *dst){//dstは参照引き渡し
   }
 
 
-void atamaopen(){
-  spi_cmd(6);
-  }
-
-void atamaclose(){
-  spi_cmd(5);
-  }
-
 void view_arduino_cmd_matrix(){
   //Serial.println(F("#   view_arduino_cmd_matrix"));//確認用
   for (int i = 0; i < CMD_SIZE; i++)
@@ -1372,14 +1361,12 @@ void display_failsafe(bool FAIL_SAFE_DISPLAY){
     Serial.println(F("DISPLAY FAIL SAFE PARAM"));
     Serial.print(F("Mode(ARDUINO/RC): "));
     Serial.println(run_mode);
-    Serial.print(F("UDP recieve fail count: "));
-    Serial.println(F(""));
   }
   }
 
 void display_nothing(){//1000msごとに表示したいものがあれば記載
   //Serial.println(F("#   display_nothing"));//確認用
-  if (UDP_CONNECTION_DISPLAY == false && ENCODER_DISPLAY == false && PID_CONTROLL_DISPLAY == false)
+  if (ENCODER_DISPLAY == false && PID_CONTROLL_DISPLAY == false)
   {
     //Serial.println(F("Display item not set"));
     //Serial.println(F("Arduino is working..."));
@@ -1392,17 +1379,17 @@ void display_speed( bool ENCODER_DISPLAY){ // motor_controllers[0] MOTOR_LEFT mo
 
   if (ENCODER_DISPLAY == true)
   {
-    //Serial.println(F("#   display_speed"));//確認用
-    //Serial.println("DISPLAY MOTOR COUNTER & SPEED");
-    //Serial.print("Mode:");
-    //Serial.println(run_mode);
+    Serial.println(F("#   display_speed"));//確認用
+    Serial.println("DISPLAY MOTOR COUNTER & SPEED");
+    Serial.print("Mode:");
+    Serial.println(run_mode);
 
-    //Serial.print(F("Encoder count (L/R):"));
-    //Serial.print(motor_controllers[MOTOR_LEFT].getRpm());   // 制御量を見るため。開発用
+    Serial.print(F("Encoder count (L/R):"));
+    Serial.print(current_count_L);
     //Serial.print(motor_controllers[MOTOR_LEFT].getSpeed()); // 制御量を見るため。開発用
     //Serial.print(String(motor_controllers[MOTOR_LEFT].getCount()));
-    //Serial.print(F(","));
-    //Serial.println(motor_controllers[MOTOR_RIGHT].getRpm());    //制御量を見るため。
+    Serial.print(F(","));
+    Serial.println(current_count_L);    //制御量を見るため。
     //Serial.println(motor_controllers[MOTOR_RIGHT].getSpeed());  //制御量を見るため。
     //Serial.println(String(motor_controllers[MOTOR_RIGHT].getCount()));
 
@@ -1425,17 +1412,18 @@ void display_target_rpm( bool ENCODER_DISPLAY){ // motor_controllers[0] MOTOR_LE
   {
     //Serial.println(F("#   display_target_rpm"));//確認用
     Serial.print(F("target_rpm[L]:"));
-    //Serial.println(String(motor_controllers[MOTOR_LEFT].getTargetRpm()));
+    Serial.println(l_count_gain);
     Serial.print(F("target_rpm[R]:"));
-    //Serial.println(String(motor_controllers[MOTOR_RIGHT].getTargetRpm()));
+    Serial.println(r_count_gain);
   }
   }
+/*
 void display_PID( bool PID_CONTROLL_DISPLAY){ // motor_controllers[0] MOTOR_LEFT motor_controllers[1] MOTOR_RIGHT
 
 
 
   if (PID_CONTROLL_DISPLAY == true)
-  {/*
+  {
     //Serial.println("#   display_PID");// 確認用
     Serial.print(F("Encoder count (L/R): "));
     //Serial.print(String(motor_controllers[MOTOR_LEFT].getCount()));
@@ -1481,15 +1469,16 @@ void display_PID( bool PID_CONTROLL_DISPLAY){ // motor_controllers[0] MOTOR_LEFT
     //Serial.print(String(motor_controllers[MOTOR_RIGHT].getPID_D()));
     Serial.print(F(" x "));
     Serial.println(String(R_KD));
-    */
+    
   }
   }
+*/
 
 void job_100ms(){//100msごとに必要な情報を表示
 
   display_speed(ENCODER_DISPLAY);
   display_target_rpm(ENCODER_DISPLAY);
-  display_PID(PID_CONTROLL_DISPLAY);
+  //display_PID(PID_CONTROLL_DISPLAY);
   display_failsafe(FAIL_SAFE_DISPLAY);
   }
 

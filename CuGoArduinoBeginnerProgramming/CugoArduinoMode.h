@@ -1,6 +1,8 @@
 #ifndef CUGOARDUINOMODE_H
 #define CUGOARDUINOMODE_H
 
+//グローバル変数が圧迫されている場合はCMD_SIZEを変更してください
+
 //インクルード関連
   #include <SPI.h>
   //#include <math.h>
@@ -25,16 +27,18 @@
   #define L_MAX_COUNT_I  9000.0f //速度上限を設定している場合はiは必ず0に
   #define R_MAX_COUNT_I  9000.0f //速度上限を設定している場合はiは必ず0に
   #define COUNT_MAX 65536
+  #define TIME_MAX 4200000 //時間計測は７０分まで
+
 
 //KITのスタートボタン
-  #define CMD_BUTTON_PIN 5 
+  //#define CMD_BUTTON_PIN 5 
 
 //動作モード定義
   #define RC_MODE 0
   #define ARDUINO_MODE 1
 
 //各種閾値
-  #define CMD_SIZE 3000 //コマンド数上限
+  #define CMD_SIZE 4096 //コマンド数上限：コマンド数上限は変更可能です。
   #define EXCEPTION_NO -32768 //int下限
 
 //グローバル変数宣言
@@ -118,9 +122,9 @@
   void button();
 
 //待機関連
-  void wait_time(int milisec);
-  void matsu(int milisec);
-  void matu(int milisec);
+  void wait_time(long int milisec);
+  void matsu(long int milisec);
+  void matu(long int milisec);
 
 //モーター制御関連
   void motor_direct_instructions(int left, int right);
@@ -171,20 +175,16 @@
   #define MOTOR_LEFT 0
   #define MOTOR_RIGHT 1
 
-  extern bool UDP_CONNECTION_DISPLAY;
   extern bool ENCODER_DISPLAY;
   extern bool PID_CONTROLL_DISPLAY;
   extern bool FAIL_SAFE_DISPLAY;
   extern bool spi_done;
 
-  void init_SPI();
   void send_spi(int mode);
   void spi_cmd(int spi_cmd_value);
   void check_achievement_spi_cmd();
   int split(String data, char delimiter, String *dst);
 
-  void atamaopen();
-  void atamaclose();
 
   void view_arduino_cmd_matrix();
   void view_flags();
@@ -192,10 +192,10 @@
   void display_nothing();
   void display_speed( bool ENCODER_DISPLAY); 
   void display_target_rpm(bool ENCODER_DISPLAY);
-  void display_PID( bool PID_CONTROLL_DISPLAY);
-  void display_detail( );
+  //void display_PID( bool PID_CONTROLL_DISPLAY);
+  void display_detail();
 
-  void job_100ms( );
+  void job_100ms();
   void job_1000ms();
   //void cugo_test(int test_number );//テスト用関数
 
