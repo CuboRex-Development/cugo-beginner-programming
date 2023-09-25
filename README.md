@@ -1,4 +1,11 @@
-# CugoArduinoKitクイックスタートガイド
+arduinoは基本消す
+CugoArduinoKit→クローラロボット開発プラットフォーム
+CuGoArduinoBeginnerProgramming→CuGoBeginnerProgramming
+関数状でもarduinoあれば削除
+CugoArduinoMode→CugoCommandMode
+CUGO_ARDUINO_MODE→CUGO_CMD_MODE
+
+# クローラロボット開発プラットフォームクイックスタートガイド
 ## 1. はじめに
 本リポジトリはCugoArduinoKitを利用するためのサンプルコードです。
 CugoArduinoKitを使ってラジコン走行や自動走行を実現できます。</br>
@@ -6,7 +13,8 @@ CugoArduinoKitを使ってラジコン走行や自動走行を実現できます
 
 ## 2. 準備
 CugoArduinoKitの利用開始までの手順を説明します。
-### 2-1. 事前準備
+
+### 2-1. 事前準備（★変更）→全削除
 クイックスタートの前に以下の手順が完了しているかを確認してください<br>
 - [ ] CugoArduinoKitの組み立て
   - 組み立てマニュアルはこちら<br>https://github.com/CuboRex-Development/cugo-arduino-beginner-programming/tree/main/manuals
@@ -17,13 +25,13 @@ CugoArduinoKitの利用開始までの手順を説明します。
 2. DOWNLOAD OPTIONSから適切なバージョンを選択
 3. JUST DOWNLOADかCONTRIBUTE & DOWNLOADを選択
 4. ダウンロードされたらファイルを実行して指示に従いインストール
-### 2-2. 学習用ソースコードダウンロード
+### 2-2. 学習用ソースコードダウンロード→PICO版へ変更
 1. ここをクリックしてダウンロード
-![download_zip](https://user-images.githubusercontent.com/22425319/208834960-235e190f-5382-4ece-a3cc-58f4546fe24c.png)
+![download_zip](https://user-images.githubusercontent.com/22425319/208834960-235e190f-5382-4ece-a3cc-58f4546fe24c.png)→変更
 
 2. ダウンロードしたファイルを解凍
 3. CuGoArduinoBeginnerProgramming.inoをダブルクリックし、ArduinoIDEを起動
-### 2-3. Aruduino UNOへの書き込み
+### 2-3. Aruduino UNOへの書き込み→★PICO版へ変更
 
 1. CuGoArduinoBeginnerProgramming.inoがArduinoIDEで開かれていることを確認
 2. USBケーブルでパソコンとAruduinoを接続
@@ -52,7 +60,6 @@ CMD_EXECUTE内では以下のコマンドの実行が可能です。<br>
 
 |  コマンド名  |  動作  |　備考 |
 | ---- | ---- | ---- |
-|  button()  |  ボタンの押し待ち  | ボタンの押されるまで待機 |
 |  matsu(1000)  |  1000ミリ秒待機  | 入力した()内の数字ミリ秒だけ待機する。1000ミリ秒＝1秒。 |
 |  susumu(1.0)  |  前に1m進む  | ()内の数字を変更することで進む距離が変更できる |
 |  modoru(1.0)  |  後ろに1m進む  | ()内の数字を変更することで進む距離が変更できる |
@@ -62,16 +69,15 @@ CMD_EXECUTE内では以下のコマンドの実行が可能です。<br>
 |  hidarimawari90()  |  左回りに90度回転  |      |
 |  migimawari180()  |  右回りに180度回転  |      |
 |  hidarimawari180()  |  左回りに180度回転  |      |
- 
-  
+   
 - 応用コマンド 一覧<br> 
 
 |  コマンド名  |  動作  |　備考 |
 | ---- | ---- | ---- |
-|  susumu(1.0,90) | 上限速度90rpmで1.0m前に進む  | ()内に移動距離と上限速度を設定。上限速度は最大180rpmで距離が短いと上限速度に到達しない場合も　|
+| susumu(1.0,90) | 上限速度90rpmで1.0m前に進む  | ()内に移動距離と上限速度を設定。上限速度は最大180rpmで距離が短いと上限速度に到達しない場合も　|
 | sagaru(1.0,90) | 上限速度90rpmで1.0m後ろに進む | ()内の設定はsusumu(1.0,90)と同様 |
 | migimawari45(90) | 上限速度90rpmで45度右に回転する | ()内に上限速度を設定。上限速度は最大180rpmで距離が短いと上限速度に到達しない場合も　|
-|migimawari90(90) | 上限速度90rpmで90度右に回転する | ()内の設定はmigimawari45(90)と同様 |
+| migimawari90(90) | 上限速度90rpmで90度右に回転する | ()内の設定はmigimawari45(90)と同様 |
 | migimawari180(90) | 上限速度90rpmで180度右に回転する  | ()内の設定はmigimawari45(90)と同様 |
 | hidarimawari45(90) | 上限速度90rpmで45度左に回転する | ()内の設定はmigimawari45(90)と同様 |
 | hidarimawari90(90) | 上限速度90rpmで90度左に回転する | ()内の設定はmigimawari45(90)と同様 |
@@ -89,7 +95,6 @@ CMD_EXECUTE内では以下のコマンドの実行が可能です。<br>
   {
   cmd_manager();  // おまじない
   // ここから↓を改造していこう！
-  button();//ボタン押し待ち
 
   susumu(1.0);
   matsu(1000); 
@@ -139,7 +144,6 @@ CMD_EXECUTE内では以下のコマンドの実行が可能です。<br>
   {
   cmd_manager();  // おまじない
   // ここから↓を改造していこう！
-  button();//ボタン押し待ち
 
   susumu(0.5); // ★デモプログラミングからの変更箇所
   matsu(1000); 
@@ -185,7 +189,6 @@ CMD_EXECUTE内では以下のコマンドの実行が可能です。<br>
   {
   cmd_manager();  // おまじない
   // ここから↓を改造していこう！
-  button();//ボタン押し待ち
 
   susumu(1.5,60); // ★デモプログラミングからの変更箇所
   matsu(1000); 
