@@ -1,4 +1,6 @@
 # クローラロボット開発プラットフォームクイックスタートガイド
+旧製品：ArduinoKitをご利用の方は、unoブランチ（https://github.com/CuboRex-Development/cugo-beginner-programming/tree/uno）をご覧ください。
+
 ## 1. はじめに
 本リポジトリはクローラロボット開発プラットフォームを利用するためのサンプルコードです。
 クローラロボット開発プラットフォームを使ってラジコン走行や自動走行を実現できます。</br>
@@ -13,7 +15,7 @@
 3. JUST DOWNLOADかCONTRIBUTE & DOWNLOADを選択
 4. ダウンロードされたらファイルを実行して指示に従いインストール
 ### 2-2. 学習用ソースコードダウンロード→PICO版へ変更
-1. ここをクリックしてダウンロード
+1. Codeボタンを選択し、Download ZIPをクリックしてダウンロード
 ![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/ea21aa32-1b2e-4d48-852d-678ad300485b)
 
 2. ダウンロードしたファイルを解凍
@@ -45,7 +47,39 @@ https://github.com/earlephilhower/arduino-pico/releases/download/global/package_
 ![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/1216aeee-82ef-4b6a-8cab-25935b4cab82)
 ![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/d236d67f-2156-4f86-a9bd-0e3b68070bc9)
 
+
+
+
 Arduino IDE バージョン1.8.19（レガシー）の場合
+
+<details>
+1. ファイル ＞ 環境設定を選択</br>
+
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/f86d603a-0910-4281-a71f-8a6cde1fee40)
+
+
+2. 追加のボードマネージャのURLに以下のURLを入力し、OKを押します。右のウィンドウボタンをクリックすると入力できるようになります。</br>
+https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json</br>
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/0b957362-a55b-4591-a8e7-7bb681eed5a0)
+
+4. ツール ＞ ボード ＞ ボードマネージャ…を選択
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/ac1f3c62-d372-4bab-ae1a-3f9090a69e10)
+
+
+5. "pico"で検索し、”Raspberry Pi Pico/RP2040”を見つけます。”インストール”ボタンを押します（すでに入っている場合は"更新"ボタンを押して最新にします）。
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/6341088e-1532-4c35-85d6-fcca6491ac46)
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/be7e4e8c-fc26-4fa0-9182-6f0392029942)
+
+
+6. スケッチ ＞ ライブラリをインクルード… ＞ ライブラリを管理…を選択
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/cf2bb2d8-17b1-4421-8b2a-f86456e95f83)
+
+
+7. RPi_Pico_TimerInterrupt.hで検索し、”RPI_PICO_TimerInterrupt”を見つけます。”インストール”ボタンを押します（すでに入っている場合は"更新"ボタンを押して最新にします）。
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/af765969-7bbd-4d24-8ce6-1c5496885bd2)
+
+
+</details>
 
 ### 2-4. Rasberry Pi Picoへの書き込み
 
@@ -67,6 +101,17 @@ USBを接続した後↓</br>
 ![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/a7bd9db9-d3d0-4221-963a-2bff952eb833)
 
 9. ボードへの書き込みが完了しましたの記載があれば書き込み完了です。
+
+### 2-5. LD-2のコマンドモードを有効化
+クローラロボット開発プラットフォームでは、安全のため、出荷時にプログラム動作する、コマンドモードを無効化しています。</br>
+以下の図に従って、電源が切れていることを確認し、DIPスイッチの2番をON側に倒してください。大変小さなスイッチですので、つまようじなどを用意して操作してください。</br>
+詳細は、取扱説明書をご覧ください。</br>
+https://drive.google.com/drive/folders/18MQUVMLYS_4JgkeGd2v7dVHmdmFaMaZc?usp=drive_link
+
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/fca21c7a-01e0-45cb-9bff-3d91ef784300)
+
+
+
 ## 3. 使用方法
 クローラロボット開発プラットフォームでは2つのモードが利用できます
 ### 3-1. ラジコンモードの利用
