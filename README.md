@@ -113,6 +113,12 @@ CMD_EXECUTE内では以下のコマンドの実行が可能です。<br>
 | turn_clockwise(60,90) | 上限速度90rpmで60度右に回転する | ()内に回転角度と上限速度を設定。上限速度は最大180rpmで距離が短いと上限速度に到達しない場合も |
 | turn_counter_clockwise(60,90) | 上限速度90rpmで60度左に回転する | ()内の設定はturn_clockwise(60,90)と同様 |
 ## 4. サンプルコード解説
+### 4-0. サンプルコードの使い方
+サンプルコードはCMD_EXECUTE()の中を変更するとコマンドを読み取り、CuGoが動作します。その他の部分を変更すると正常に動作しなくなります。何を変更してしまって、わけが分からなくなった場合は再DLしてもう一度編集しなおしてください。
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/6c76ea0c-60c1-4d7c-a775-e70fd0ed15bb)
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/447efb9e-b5b8-4b9e-93f0-3d6374e6ac50)
+
+
 ### 4-1. サンプルコードの実行
 1. ファイル内のプログラミングの一番下にある下のコードを確認してください。
 - <details>
