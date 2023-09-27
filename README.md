@@ -2,23 +2,30 @@
 ## 1. はじめに
 本リポジトリはクローラロボット開発プラットフォームを利用するためのサンプルコードです。
 クローラロボット開発プラットフォームを使ってラジコン走行や自動走行を実現できます。</br>
-![クローラロボット開発プラットフォーム](https://user-images.githubusercontent.com/22425319/208833953-755492cb-052f-4d29-8a24-4b87168e3f8e.jpg)
+![V4メイン](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/e1b76ade-498c-49db-9c62-2013c0201fa4)
 
 ## 2. 準備
 クローラロボット開発プラットフォームの利用開始までの手順を説明します。
 
 ### 2-1. Arduino IDEのインストール
 1. 公式ページ( https://www.arduino.cc/en/software )へ移動
-2. DOWNLOAD OPTIONSから適切なバージョンを選択
+2. DOWNLOAD OPTIONSからご自身のOSのバージョンを選択
 3. JUST DOWNLOADかCONTRIBUTE & DOWNLOADを選択
 4. ダウンロードされたらファイルを実行して指示に従いインストール
 ### 2-2. 学習用ソースコードダウンロード→PICO版へ変更
 1. ここをクリックしてダウンロード
-![download_zip](https://user-images.githubusercontent.com/22425319/208834960-235e190f-5382-4ece-a3cc-58f4546fe24c.png)→変更
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/ea21aa32-1b2e-4d48-852d-678ad300485b)
 
 2. ダウンロードしたファイルを解凍
 3. CugoBeginnerProgramming.inoをダブルクリックし、ArduinoIDEを起動
-### 2-3. Rasberry Pi Picoへの書き込み
+
+### 2-3. Rasberry Pi Picoの初期設定
+Arduino IDE でRaspberryPiPicoに書き込む場合、
+Arduino IDE バージョン2系（最新版）の場合
+
+Arduino IDE バージョン1.8.19（レガシー）の場合
+
+### 2-4. Rasberry Pi Picoへの書き込み
 
 1. CugoBeginnerProgramming.inoがArduinoIDEで開かれていることを確認
 //★ボードマネージャーの記載https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json,https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
