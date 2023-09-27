@@ -2,6 +2,9 @@
 旧製品：ArduinoKitをご利用の方は、こちらをご覧ください。</br>
 https://github.com/CuboRex-Development/cugo-beginner-programming/tree/uno
 
+より発展的な開発をされたい方はこちらのSDKコマンドリファレンスをご覧ください。</br>
+https://github.com/CuboRex-Development/cugo-sdk-samples/tree/pico
+
 ## 1. はじめに
 本リポジトリはクローラロボット開発プラットフォームを利用するためのサンプルコードです。
 クローラロボット開発プラットフォームを使ってラジコン走行や自動走行を実現できます。</br>
