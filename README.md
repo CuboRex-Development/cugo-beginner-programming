@@ -15,7 +15,7 @@ https://github.com/CuboRex-Development/cugo-beginner-programming/tree/uno
 2. DOWNLOAD OPTIONSからご自身のOSのバージョンを選択
 3. JUST DOWNLOADかCONTRIBUTE & DOWNLOADを選択
 4. ダウンロードされたらファイルを実行して指示に従いインストール
-### 2-2. 学習用ソースコードダウンロード→PICO版へ変更
+### 2-2. 学習用ソースコードダウンロード
 1. Codeボタンを選択し、Download ZIPをクリックしてダウンロード
 ![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/ea21aa32-1b2e-4d48-852d-678ad300485b)
 
