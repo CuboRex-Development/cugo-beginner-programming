@@ -1,4 +1,4 @@
-# クローラロボット開発プラットフォームクイックスタートガイド
+# クローラロボット開発プラットフォームスタートガイド
 旧製品：ArduinoKitをご利用の方は、unoブランチ（https://github.com/CuboRex-Development/cugo-beginner-programming/tree/uno）をご覧ください。
 
 ## 1. はじめに
