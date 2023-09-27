@@ -1,4 +1,6 @@
 # CugoArduinoKitクイックスタートガイド
+新製品のクローラロボット開発プラットフォームをご利用の方はこちらをご覧ください。</br>
+https://github.com/CuboRex-Development/cugo-beginner-programming/tree/pico
 ## 1. はじめに
 本リポジトリはCugoArduinoKitを利用するためのサンプルコードです。
 CugoArduinoKitを使ってラジコン走行や自動走行を実現できます。</br>
