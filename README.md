@@ -20,20 +20,53 @@
 3. CugoBeginnerProgramming.inoをダブルクリックし、ArduinoIDEを起動
 
 ### 2-3. Rasberry Pi Picoの初期設定
-Arduino IDE でRaspberryPiPicoに書き込む場合、
+Arduino IDE でRaspberryPiPicoに書き込む場合、IDEにRaspberryPiPicoのボード情報をあらかじめ取得する必要があります。</br>
+
 Arduino IDE バージョン2系（最新版）の場合
+
+1. ファイル ＞ 環境設定を選択</br>
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/f08cbb59-36f2-4ba0-80a3-889a7c337e0f)
+
+2. 追加のボードマネージャのURLに以下のURLを入力し、OKを押します。右のウィンドウボタンをクリックすると入力できるようになります。</br>
+https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json</br>
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/fc20fa37-3747-4060-8da3-9ae169b9df93)
+
+4. ツール ＞ ボード ＞ ボードマネージャ…を選択
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/320f1434-1135-4788-8b6e-df6194c24781)
+
+5. "pico"で検索し、”Raspberry Pi Pico/RP2040”を見つけます。”INSTALL”ボタンを押します（すでに入っている場合はUPDATEボタンを押して最新にします）。
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/98a99647-b980-4e2b-aec4-b91b3419649b)
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/f5135740-f1cb-436a-8d63-f68a6cd3122f)
+
+6. スケッチ ＞ ライブラリをインクルード… ＞ ライブラリを管理…を選択
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/1e1775bd-3399-4f40-82d8-8d5590d21918)
+
+7. RPi_Pico_TimerInterrupt.hで検索し、”RPI_PICO_TimerInterrupt”を見つけます。”INSTALL”ボタンを押します（すでに入っている場合はUPDATEボタンを押して最新にします）。
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/1216aeee-82ef-4b6a-8cab-25935b4cab82)
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/d236d67f-2156-4f86-a9bd-0e3b68070bc9)
 
 Arduino IDE バージョン1.8.19（レガシー）の場合
 
 ### 2-4. Rasberry Pi Picoへの書き込み
 
-1. CugoBeginnerProgramming.inoがArduinoIDEで開かれていることを確認
-//★ボードマネージャーの記載https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json,https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
-2. USBケーブルでパソコンとAruduinoを接続
-3. ツール ＞ ボード から"Rasberry Pi Pico"を選択　
-4. ツール ＞ ポート からRasberry Pi Picoのポートを選択
-5. 矢印ボタン " → "を選択し、マイコンボードへ書き込むを実行
-6. ボードへの書き込みが完了しましたの記載があれば書き込み完了
+1. CugoBeginnerProgramming.inoがArduino IDEで開かれていることを確認
+2. USBケーブルでパソコンとRaspberry Pi Picoを接続。PCに認識されないときは基板にある”BOOTSEL”ボタンを押しながらPCに挿してください。</br>
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/483c2a4e-8850-4924-90de-a17b09dd775f)
+
+4. ツール ＞ ボード ＞ Raspberry Pi Pico/RP2040 ＞ Rasberry Pi Pico を選択
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/db962aa7-1deb-4125-a7f9-eec2b2707433)
+
+6. ツール ＞ ポート からRasberry Pi Picoのポートを選択します。ポートはUSBを接続する前と後を比較して増えたものがRaspberry Pi Picoなので、それを選択します。</br>
+USBを接続する前↓</br>
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/02be584c-bd9d-4c96-a9dc-0bca2dbb5e5a)
+
+USBを接続した後↓</br>
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/50e47ad7-b85d-4dd5-82ba-f441ba3da83d)
+
+8. 矢印ボタン " → "を選択し、マイコンボードへ書き込むを実行</br>
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/a7bd9db9-d3d0-4221-963a-2bff952eb833)
+
+9. ボードへの書き込みが完了しましたの記載があれば書き込み完了です。
 ## 3. 使用方法
 クローラロボット開発プラットフォームでは2つのモードが利用できます
 ### 3-1. ラジコンモードの利用
