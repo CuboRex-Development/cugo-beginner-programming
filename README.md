@@ -164,7 +164,8 @@ CMD_EXECUTE内では以下のコマンドの実行が可能です。<br>
 ## 4. サンプルコード解説
 ### 4-0. サンプルコードの使い方
 サンプルコードはCMD_EXECUTE()の中を変更するとコマンドを読み取り、CuGoが動作します。その他の部分を変更すると正常に動作しなくなります。何を変更してしまって、わけが分からなくなった場合は再DLしてもう一度編集しなおしてください。
-![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/6c76ea0c-60c1-4d7c-a775-e70fd0ed15bb)
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/30005762-9c94-4e0a-abd8-a90d3870ea01)
+
 ![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/447efb9e-b5b8-4b9e-93f0-3d6374e6ac50)
 
 
