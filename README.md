@@ -92,15 +92,17 @@ Arduino IDE上部タブから”CugoCommandMode.h”を選択
 ![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/317a7a9c-4c36-41dc-a885-6b6a8229162e)
 
 
-下記パラメータを使用しているモデルに合わせます。図のようにコメントアウトしてご自身のモデルのパラメータが反映されるように調整してください。
+下記パラメータを使用しているモデルに合わせます。
 https://github.com/CuboRex-Development/cugo-beginner-programming/blob/339cfe4f8766082ebc18254b1fb26a08e4c47f0f/CugoBeginnerProgramming/CugoCommandMode.h#L13-L25
+
+プログラムが下の図と同じになるように必要に応じてプログラムを書き換え、ご自身のモデルのパラメータが反映されるように調整してください。</br>
 
 V4の場合</br>
 ”CugoCommandMode.h”は、サンプルプログラムから変更する必要はありません。</br>
 ![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/27883660/db5f101e-2856-4625-b521-bacb0cdf0d25)
 
 V3iの場合</br>
-”CugoCommandMode.h”の15行目から19行目をコメントアウトし、21行目から25行目のコメントアウトを解除します。</br>
+”CugoCommandMode.h”の15行目から19行目の行頭に`//`を追記し、21行目から25行目の行頭の`//`を削除します。</br>
 ![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/27883660/7a9fe102-1705-432c-af83-82d7e4e5e73e)
 
 
