@@ -96,9 +96,11 @@ Arduino IDE上部タブから”CugoCommandMode.h”を選択
 https://github.com/CuboRex-Development/cugo-beginner-programming/blob/339cfe4f8766082ebc18254b1fb26a08e4c47f0f/CugoBeginnerProgramming/CugoCommandMode.h#L13-L25
 
 V4の場合</br>
+”CugoCommandMode.h”は、サンプルプログラムから変更する必要はありません。</br>
 ![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/27883660/db5f101e-2856-4625-b521-bacb0cdf0d25)
 
 V3iの場合</br>
+”CugoCommandMode.h”の15行目から19行目をコメントアウトし、21行目から25行目のコメントアウトを解除します。</br>
 ![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/27883660/7a9fe102-1705-432c-af83-82d7e4e5e73e)
 
 
