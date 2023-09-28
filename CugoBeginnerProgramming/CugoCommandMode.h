@@ -11,11 +11,18 @@
   #include "CugoCommandMode.h"
 
 //cugo仕様関連
+  // CuGo V4 のパラメータ
   #define wheel_radius_l  0.03858d
   #define wheel_radius_r  0.03858d
   #define tread  0.380d
-  #define encoder_resolution 360.0d 
-  #define MAX_MOTOR_RPM 180 //モータの速度上限値
+  #define encoder_resolution  600.0d
+  #define MAX_MOTOR_RPM  130    //モータの速度上限値
+  // CuGo V3i のパラメータ
+  // #define wheel_radius_l  0.03858d
+  // #define wheel_radius_r  0.03858d
+  // #define tread  0.376d
+  // #define encoder_resolution  360.0d
+  // #define MAX_MOTOR_RPM  180    //モータの速度上限値
 
 //PID位置制御のゲイン調整
   #define L_COUNT_KP  0.04f
