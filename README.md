@@ -85,7 +85,25 @@ https://github.com/earlephilhower/arduino-pico/releases/download/global/package_
 
 </details>
 
-### 2-4. Rasberry Pi Picoへの書き込み
+### 2-4. 制御パラメータの確認
+クローラロボット開発プラットフォームには、V3iモデルとV4モデルがあります。各モデルごとに制御パラメータが異なる場所がありますので、確認をしてください。</br>
+
+Arduino IDE上部タブから”CugoCommandMode.h”を選択
+![image](https://github.com/CuboRex-Development/cugo-beginner-programming/assets/22425319/317a7a9c-4c36-41dc-a885-6b6a8229162e)
+
+
+下記パラメータを使用しているモデルに合わせます。図のようにコメントアウトしてご自身のモデルのパラメータが反映されるように調整してください。
+https://github.com/CuboRex-Development/cugo-beginner-programming/blob/b431f93bdc3d28a15e055839c53bb16287695b01/CugoBeginnerProgramming/CugoCommandMode.h#L13-L18
+
+V4の場合</br>
+V4のヘッダファイルのスクリーンショット</br>
+
+V3iの場合</br>
+V3iのヘッダファイルのスクリーンショット</br>
+
+
+
+### 2-5. Rasberry Pi Picoへの書き込み
 
 1. CugoBeginnerProgramming.inoがArduino IDEで開かれていることを確認
 2. USBケーブルでパソコンとRaspberry Pi Picoを接続。PCに認識されないときは基板にある”BOOTSEL”ボタンを押しながらPCに挿してください。</br>
@@ -106,7 +124,7 @@ USBを接続した後↓</br>
 
 9. ボードへの書き込みが完了しましたの記載があれば書き込み完了です。
 
-### 2-5. LD-2のコマンドモードを有効化
+### 2-6. LD-2のコマンドモードを有効化
 クローラロボット開発プラットフォームでは、安全のため、出荷時にプログラム動作する、コマンドモードを無効化しています。</br>
 以下の図に従って、電源が切れていることを確認し、DIPスイッチの2番をON側に倒してください。大変小さなスイッチですので、つまようじなどを用意して操作してください。</br>
 詳細は、取扱説明書をご覧ください。</br>
