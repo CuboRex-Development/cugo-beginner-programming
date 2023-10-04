@@ -85,6 +85,30 @@ https://github.com/earlephilhower/arduino-pico/releases/download/global/package_
 
 </details>
 
+
+Pythonの'encoding'モジュールが見つからないエラーでビルドできない場合
+<details>
+以下の図のようにpythonがうまく実行できないことでコンパイルが通らないことがあります。これはボードマネージャでRP2040をインストールしたのち、
+削除してもう一度入れなおした際に発生します。すでに一度RP2040をインストールした後に2回目以降にインストールする際に必要なデータが展開しきれず、必要なものが再配置されないバグが発生していると考えられます。
+  
+![image](https://github.com/CuboRex-Development/cugo-sdk-samples/assets/22425319/bdbb5a6a-901c-4152-b1f5-6bb783291450)
+
+
+コマンドプロンプトなどのなんらかのShellを起動して以下のファイルを削除してください。</br>
+C:\Users\YutaNakamura\AppData\Local\Arduino15\packages\rp2040\tools\pqt-python3\1.0.1-base-3a57aed\
+
+![image](https://github.com/CuboRex-Development/cugo-sdk-samples/assets/22425319/6f26ac47-6050-43bc-bdfa-2f72e3d013c7)
+
+
+上記のファイルを削除したのち、ボードマネージャからRP2040を削除します。
+![image](https://github.com/CuboRex-Development/cugo-sdk-samples/assets/22425319/02531edd-d647-4972-8e04-e68af82a8892)
+
+
+再度RP2040をインストールし、コンパイルできるようになったかを確認します。
+![image](https://github.com/CuboRex-Development/cugo-sdk-samples/assets/22425319/af1ba464-8246-4cb7-8ad5-cc361c9c6bf0)
+
+</details>
+
 ### 2-4. 制御パラメータの確認
 クローラロボット開発プラットフォームには、V3iモデルとV4モデルがあります。各モデルごとに制御パラメータが異なる場所がありますので、確認をしてください。</br>
 
