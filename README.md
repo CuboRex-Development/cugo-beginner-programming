@@ -174,7 +174,7 @@ https://drive.google.com/drive/folders/18MQUVMLYS_4JgkeGd2v7dVHmdmFaMaZc?usp=dri
 
 になります<br>
 ![radiocontrol](https://user-images.githubusercontent.com/22425319/208835778-1dd170dc-3de1-4dce-b7ee-83f2c1e0838d.png)
-### 3-2. 自動走行モードの利用
+### 3-2. プログラムモードの利用
 CugoBeginnerProgramming内の一番下にあるCMD_EXECUTEの関数内をプログラミングすることで自動走行が可能です。
 ### コマンド 一覧
 CMD_EXECUTE内では以下のコマンドの実行が可能です。<br>
